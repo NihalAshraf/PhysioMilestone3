@@ -1,45 +1,27 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parent Dashboard</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- Chart.js CDN for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Heroicons CDN for icons -->
+
+    <!-- Heroicons CDN -->
     <script src="https://unpkg.com/heroicons@2.1.1/24/outline/index.js"></script>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Using Inter as the default font */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* A light gray background like in the prototype */
-        }
-        /* Custom styles for the calendar */
-        .calendar-day {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 40px;
-            width: 40px;
-            border-radius: 50%;
-        }
-        .day-completed {
-            background-color: #dcfce7; /* Light green */
-            color: #166534; /* Dark green */
-        }
-        .day-missed {
-            background-color: #fee2e2; /* Light red */
-            color: #991b1b; /* Dark red */
-        }
-        .day-today {
-            border: 2px solid #f59e0b; /* Amber border */
-        }
-    </style>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{% static 'Child/dashboard.css' %}">
 </head>
 <body class="text-slate-800">
 
@@ -49,14 +31,10 @@
             <div>
                 <h1 class="text-3xl font-bold text-slate-900">Parent Dashboard</h1>
                 <p class="text-slate-500 mt-1">
-                    <!-- Replace with Django template variable -->
                     Welcome, Parent User! Here you can view your child's profile, assigned exercises, and track their progress.
                 </p>
             </div>
-            <!-- Logout button -->
-            <a href="#" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
-                Logout
-            </a>
+            <a href="#" class="bg-white border border-slate-300 ...">Logout</a>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -66,12 +44,10 @@
                 <section class="bg-white p-6 rounded-2xl shadow-md">
                     <h2 class="text-xl font-bold mb-4">Child Profile</h2>
                     <div class="flex items-center space-x-4">
-                        <!-- Placeholder for child's initial -->
                         <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center">
                             <span class="text-white text-3xl font-bold">A</span>
                         </div>
                         <div>
-                            <!-- Replace with Django template variables -->
                             <h3 class="text-lg font-semibold">Aarav Sharma</h3>
                             <p class="text-slate-500">Age: 6 years</p>
                         </div>
@@ -84,12 +60,12 @@
 
             <!-- Right Column: Main Content -->
             <div class="lg:col-span-2 space-y-8">
+
                 <!-- Weekly Progress Overview -->
                 <section class="bg-white p-6 rounded-2xl shadow-md">
                     <h2 class="text-xl font-bold mb-2">Weekly Progress Overview</h2>
                     <p class="text-slate-500 mb-6">This chart shows your child's overall progress score over the last few weeks.</p>
                     <div>
-                        <!-- Chart.js canvas element -->
                         <canvas id="weeklyProgressChart"></canvas>
                     </div>
                 </section>
@@ -99,44 +75,14 @@
                     <h2 class="text-xl font-bold mb-2">Assigned Exercises</h2>
                     <p class="text-slate-500 mb-6">Here are the exercises assigned for your child. Click "Start Exercise" to begin a gamified session.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        
-                        <!-- Exercise Card 1 (Assigned) - Loop this with Django -->
+                        <!-- Example Exercise Card -->
                         <div class="border border-slate-200 rounded-lg p-4 flex flex-col">
                             <div class="flex-grow">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-amber-500 mb-2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.962a3.75 3.75 0 0 1 5.25 0m-5.25 0a3.75 3.75 0 0 0-5.25 0M12 19.5a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v12a3 3 0 0 1-3 3Z" />
-                                </svg>
                                 <h3 class="font-semibold">Squat Jumps</h3>
                                 <p class="text-sm text-slate-500 mt-1">Jump up and down, bending knees deeply.</p>
                                 <p class="text-sm mt-2"><span class="font-semibold">Status:</span> <span class="text-blue-600">Assigned</span></p>
                             </div>
                             <button class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Start Exercise</button>
-                        </div>
-
-                        <!-- Exercise Card 2 (Assigned) -->
-                        <div class="border border-slate-200 rounded-lg p-4 flex flex-col">
-                           <div class="flex-grow">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-amber-500 mb-2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a5.25 5.25 0 0 1 5.25 5.25c0 2.323-1.41 4.31-3.437 5.013a17.247 17.247 0 0 1-1.688 4.237 1.5 1.5 0 0 1-2.65 0 17.247 17.247 0 0 1-1.688-4.237A5.25 5.25 0 0 1 12 6.75Zm0 0V4.5m0 2.25a2.25 2.25 0 0 0-2.25 2.25c0 1.002.684 1.833 1.616 2.122a16.48 16.48 0 0 0 .634 3.378 1.125 1.125 0 0 0 2.232 0 16.48 16.48 0 0 0 .634-3.378A2.25 2.25 0 0 0 12 6.75Z" />
-                                </svg>
-                                <h3 class="font-semibold">Arm Circles</h3>
-                                <p class="text-sm text-slate-500 mt-1">Make large circles with arms, forward and backward.</p>
-                                <p class="text-sm mt-2"><span class="font-semibold">Status:</span> <span class="text-blue-600">Assigned</span></p>
-                            </div>
-                            <button class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Start Exercise</button>
-                        </div>
-
-                        <!-- Exercise Card 3 (Completed) -->
-                        <div class="border border-slate-200 rounded-lg p-4 flex flex-col bg-slate-50">
-                            <div class="flex-grow">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-slate-400 mb-2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.82m5.84-2.56a12.022 12.022 0 0 0-5.84 0m5.84 0a11.953 11.953 0 0 1-2.625 6.32m-3.215-6.32a11.953 11.953 0 0 0-2.625 6.32m0-6.32a6 6 0 0 1-5.84-7.38v-4.82m5.84 2.56a12.022 12.022 0 0 0-5.84 0m5.84 0a11.953 11.953 0 0 1 2.625-6.32m3.215 6.32a11.953 11.953 0 0 0 2.625-6.32m0 6.32a6 6 0 0 1 5.84 7.38v4.82m-5.84-2.56a12.022 12.022 0 0 0 5.84 0m-5.84 0a11.953 11.953 0 0 1 2.625 6.32m-3.215-6.32a11.953 11.953 0 0 0 2.625 6.32M12 6.75a2.25 2.25 0 1 1 0-4.5 2.25 2.25 0 0 1 0 4.5Z" />
-                                </svg>
-                                <h3 class="font-semibold text-slate-600">Balance Beam Walk</h3>
-                                <p class="text-sm text-slate-500 mt-1">Walk, heel-to-toe on a straight line.</p>
-                                <p class="text-sm mt-2"><span class="font-semibold">Status:</span> <span class="text-green-600">Completed</span></p>
-                            </div>
-                            <button class="w-full mt-4 bg-slate-200 text-slate-500 font-semibold py-2 px-4 rounded-lg cursor-not-allowed">Start Exercise</button>
                         </div>
                     </div>
                 </section>
@@ -146,50 +92,12 @@
                     <h2 class="text-xl font-bold mb-2">Session Calendar</h2>
                     <p class="text-slate-500 mb-6">Track completed and missed sessions for a clear overview of your child's engagement.</p>
                     <div class="grid grid-cols-7 gap-2 text-center font-semibold text-slate-500 text-sm">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
+                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                     </div>
                     <div class="grid grid-cols-7 gap-2 mt-2 text-sm">
-                        <!-- This should be generated dynamically with Django/JS -->
-                        <div class="text-slate-400"></div>
-                        <div class="text-slate-400"></div>
-                        <div class="text-slate-400"></div>
-                        <div><span class="calendar-day">1</span></div>
                         <div><span class="calendar-day day-completed">2</span></div>
                         <div><span class="calendar-day day-missed">3</span></div>
-                        <div><span class="calendar-day day-completed">4</span></div>
-                        <div><span class="calendar-day day-completed">5</span></div>
-                        <div><span class="calendar-day day-completed">6</span></div>
-                        <div><span class="calendar-day">7</span></div>
-                        <div><span class="calendar-day">8</span></div>
-                        <div><span class="calendar-day day-completed">9</span></div>
-                        <div><span class="calendar-day day-completed">10</span></div>
-                        <div><span class="calendar-day">11</span></div>
-                        <div><span class="calendar-day day-completed">12</span></div>
-                        <div><span class="calendar-day day-missed">13</span></div>
-                        <div><span class="calendar-day">14</span></div>
-                        <div><span class="calendar-day day-completed">15</span></div>
-                        <div><span class="calendar-day">16</span></div>
-                        <div><span class="calendar-day day-completed">17</span></div>
-                        <div><span class="calendar-day day-completed">18</span></div>
-                        <div><span class="calendar-day day-completed">19</span></div>
-                        <div><span class="calendar-day day-completed">20</span></div>
-                        <div><span class="calendar-day day-completed">21</span></div>
-                        <div><span class="calendar-day">22</span></div>
-                        <div><span class="calendar-day day-completed">23</span></div>
-                        <div><span class="calendar-day">24</span></div>
-                        <div><span class="calendar-day day-completed">25</span></div>
-                        <div><span class="calendar-day">26</span></div>
-                        <div><span class="calendar-day">27</span></div>
                         <div><span class="calendar-day day-today">28</span></div>
-                        <div><span class="calendar-day">29</span></div>
-                        <div><span class="calendar-day">30</span></div>
-                        <div><span class="calendar-day">31</span></div>
                     </div>
                 </section>
             </div>
@@ -197,49 +105,23 @@
     </div>
 
     <script>
-        // Chart.js configuration for the weekly progress chart
+        // Chart.js example config
         const ctx = document.getElementById('weeklyProgressChart').getContext('2d');
-        const weeklyProgressChart = new Chart(ctx, {
+        new Chart(ctx, {
             type: 'line',
             data: {
-                // Replace with Django template variables
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
                 datasets: [{
-                    label: 'Overall Progress Score',
-                    // Replace with Django template variables
-                    data: [65, 70, 72, 78, 85, 88],
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)', // Amber with transparency
-                    borderColor: 'rgba(245, 158, 11, 1)', // Solid Amber
+                    label: 'Overall Progress',
+                    data: [65, 70, 75, 85],
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderColor: 'rgba(245, 158, 11, 1)',
                     borderWidth: 2,
-                    tension: 0.4, // Makes the line curvy
-                    pointBackgroundColor: 'rgba(245, 158, 11, 1)',
-                    pointRadius: 4,
+                    tension: 0.4,
                     fill: true,
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            stepSize: 10
-                        },
-                        title: {
-                           display: true,
-                           text: 'Score (%)'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        align: 'end',
-                    }
-                }
-            }
+            options: { responsive: true }
         });
     </script>
 </body>

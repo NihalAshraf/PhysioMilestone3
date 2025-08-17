@@ -1,0 +1,29 @@
+/* Use Inter font everywhere */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; /* Light gray */
+}
+
+/* Calendar styles */
+.calendar-day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+}
+
+.day-completed {
+    background-color: #dcfce7; /* Light green */
+    color: #166534; /* Dark green */
+}
+
+.day-missed {
+    background-color: #fee2e2; /* Light red */
+    color: #991b1b; /* Dark red */
+}
+
+.day-today {
+    border: 2px solid #f59e0b; /* Amber border */
+}
