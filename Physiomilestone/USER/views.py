@@ -9,7 +9,9 @@ def register_view(request):
         password="password"
         role=request.POST.get("role")
 
-        USER
+        user=user.objects.create(
+            username
+        )
 
 def login_view(request):
     if request.method=="POST":
