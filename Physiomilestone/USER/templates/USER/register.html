@@ -2,10 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<<<<<<< HEAD
     <title>Register</title>
     <link rel="stylesheet" href="{% static "USER/register.css" %}">
-=======
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - PhysioMilestones</title>
@@ -18,7 +17,6 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Simple fade-in animation for the form */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -27,14 +25,13 @@
             animation: fadeIn 0.5s ease-out forwards;
         }
     </style>
->>>>>>> 4d24a876a5e1e1e473b6fdfae4ec22f1bc9e273c
 </head>
 <body class="bg-slate-50">
 
     <div class="min-h-screen flex items-center justify-center">
         <div class="w-full max-w-5xl flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden m-4">
             
-            <!-- Left Panel: Branding & Illustration -->
+            <!-- Left Panel -->
             <div class="w-full md:w-1/2 bg-slate-800 p-8 sm:p-12 text-white flex flex-col justify-center items-center text-center">
                 <div class="transform transition-transform duration-500 hover:scale-105">
                     <svg class="w-32 h-32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,26 +53,89 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="space-y-6">
+
+                        <!-- Username -->
                         <div>
                             <label for="username" class="block text-sm font-medium text-slate-700">Username</label>
-                            <input type="text" name="username" id="username" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="Choose a username" required>
+                            <input type="text" name="username" id="username" 
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Choose a username" required>
                         </div>
 
+                        <!-- First Name -->
                         <div>
-                            <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
-                            <input type="password" name="password" id="password" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="Create a secure password" required>
+                            <label for="first_name" class="block text-sm font-medium text-slate-700">First Name</label>
+                            <input type="text" name="first_name" id="first_name"
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Enter your first name" required>
                         </div>
 
+                        <!-- Last Name -->
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-slate-700">Last Name</label>
+                            <input type="text" name="last_name" id="last_name"
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Enter your last name" required>
+                        </div>
+
+                        <!-- Password -->
+                        <div>
+                            <label for="password1" class="block text-sm font-medium text-slate-700">Password</label>
+                            <input type="password" name="password1" id="password1" 
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Create a secure password" required>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div>
+                            <label for="password2" class="block text-sm font-medium text-slate-700">Confirm Password</label>
+                            <input type="password" name="password2" id="password2" 
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Confirm your password" required>
+                        </div>
+
+                        <!-- Role -->
                         <div>
                             <label for="role" class="block text-sm font-medium text-slate-700">I am a...</label>
-                            <select name="role" id="role" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition">
+                            <select name="role" id="role" 
+                                    class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm">
                                 <option value="child">Parent / Child</option>
                                 <option value="doctor">Doctor</option>
                             </select>
                         </div>
 
+                        <!-- Age -->
                         <div>
-                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-transform transform hover:scale-105">
+                            <label for="age" class="block text-sm font-medium text-slate-700">Age</label>
+                            <input type="number" name="age" id="age"
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Enter age">
+                        </div>
+
+                        <!-- Parent Name -->
+                        <div>
+                            <label for="parent_name" class="block text-sm font-medium text-slate-700">Parent Name</label>
+                            <input type="text" name="parent_name" id="parent_name"
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Enter parent's full name">
+                        </div>
+
+                        <!-- Contact Number -->
+                        <div>
+                            <label for="contact_number" class="block text-sm font-medium text-slate-700">Contact Number</label>
+                            <input type="text" name="contact_number" id="contact_number"
+                                   class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm"
+                                   placeholder="Enter contact number">
+                        </div>
+                            {% if form.errors %}
+                                <div style="color: red;">
+                                    {{ form.errors }}
+                                 </div>
+                            {% endif %}
+                        <!-- Submit -->
+                        <div>
+                            <button type="submit" 
+                                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-transform transform hover:scale-105">
                                 Register
                             </button>
                         </div>

@@ -1,128 +1,111 @@
+{% extends 'Child/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parent Dashboard</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Chart.js CDN for graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block title %}Parent Dashboard{% endblock %}
 
-    <!-- Heroicons CDN -->
-    <script src="https://unpkg.com/heroicons@2.1.1/24/outline/index.js"></script>
+{% block content %}
+<header class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-900">Parent Dashboard</h1>
+    <p class="text-slate-500 mt-1">
+        Welcome, {{ name }}! Here you can view your child's profile, assigned exercises, and track their progress.
+    </p>
+</header>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Left Column: Child Profile -->
+    <aside class="lg:col-span-1 space-y-8">
+        <section class="bg-white p-6 rounded-2xl shadow-md">
+            <h2 class="text-xl font-bold mb-4"></h2>
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center">
+                    <span class="text-white text-3xl font-bold">{{ name|slice:":1" }}</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">{{ name }}</h3>
+                    <p class="text-slate-500">Age: {{ age }} years</p>
+                </div>
+            </div>
+        </section>
+    </aside>
 
-    <!-- External CSS -->
-    <link rel="stylesheet" href="{% static 'Child/dashboard.css' %}">
-</head>
-<body class="text-slate-800">
-
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-        <!-- Header Section -->
-        <header class="flex justify-between items-center mb-8">
+    <!-- Right Column: Main Content -->
+    <div class="lg:col-span-2 space-y-8">
+        <!-- Weekly Progress Overview -->
+        <section class="bg-white p-6 rounded-2xl shadow-md">
+            <h2 class="text-xl font-bold mb-2">Weekly Progress Overview</h2>
+            <p class="text-slate-500 mb-6">This chart shows your child's overall progress score over the last few weeks.</p>
             <div>
-                <h1 class="text-3xl font-bold text-slate-900">Parent Dashboard</h1>
-                <p class="text-slate-500 mt-1">
-                    Welcome, Parent User! Here you can view your child's profile, assigned exercises, and track their progress.
-                </p>
+                <canvas id="weeklyProgressChart"></canvas>
             </div>
-            <a href="#" class="bg-white border border-slate-300 ...">Logout</a>
-        </header>
+        </section>
 
-        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <!-- Left Column: Child Profile -->
-            <aside class="lg:col-span-1 space-y-8">
-                <section class="bg-white p-6 rounded-2xl shadow-md">
-                    <h2 class="text-xl font-bold mb-4">Child Profile</h2>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center">
-                            <span class="text-white text-3xl font-bold">A</span>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold">Aarav Sharma</h3>
-                            <p class="text-slate-500">Age: 6 years</p>
-                        </div>
+        <!-- Assigned Exercises -->
+        <section class="bg-white p-6 rounded-2xl shadow-md">
+            <h2 class="text-xl font-bold mb-2">Assigned Exercises</h2>
+            <p class="text-slate-500 mb-6">Here are the exercises assigned for your child. Click "Start Exercise" to begin a gamified session.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for exercise in assigned_exercises %}
+                <div class="border border-slate-200 rounded-lg p-4 flex flex-col">
+                    <div class="flex-grow">
+                        <h3 class="font-semibold">{{ exercise.name }}</h3>
+                        <p class="text-sm text-slate-500 mt-1">{{ exercise.description }}</p>
+                        <p class="text-sm mt-2"><span class="font-semibold">Status:</span>
+                            <span class="text-blue-600">{{ exercise.status }}</span>
+                        </p>
                     </div>
-                    <button class="w-full mt-6 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-lg transition-colors">
-                        Edit Profile
-                    </button>
-                </section>
-            </aside>
-
-            <!-- Right Column: Main Content -->
-            <div class="lg:col-span-2 space-y-8">
-
-                <!-- Weekly Progress Overview -->
-                <section class="bg-white p-6 rounded-2xl shadow-md">
-                    <h2 class="text-xl font-bold mb-2">Weekly Progress Overview</h2>
-                    <p class="text-slate-500 mb-6">This chart shows your child's overall progress score over the last few weeks.</p>
-                    <div>
-                        <canvas id="weeklyProgressChart"></canvas>
-                    </div>
-                </section>
-
-                <!-- Assigned Exercises -->
-                <section class="bg-white p-6 rounded-2xl shadow-md">
-                    <h2 class="text-xl font-bold mb-2">Assigned Exercises</h2>
-                    <p class="text-slate-500 mb-6">Here are the exercises assigned for your child. Click "Start Exercise" to begin a gamified session.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Example Exercise Card -->
-                        <div class="border border-slate-200 rounded-lg p-4 flex flex-col">
-                            <div class="flex-grow">
-                                <h3 class="font-semibold">Squat Jumps</h3>
-                                <p class="text-sm text-slate-500 mt-1">Jump up and down, bending knees deeply.</p>
-                                <p class="text-sm mt-2"><span class="font-semibold">Status:</span> <span class="text-blue-600">Assigned</span></p>
-                            </div>
-                            <button class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Start Exercise</button>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Session Calendar -->
-                <section class="bg-white p-6 rounded-2xl shadow-md">
-                    <h2 class="text-xl font-bold mb-2">Session Calendar</h2>
-                    <p class="text-slate-500 mb-6">Track completed and missed sessions for a clear overview of your child's engagement.</p>
-                    <div class="grid grid-cols-7 gap-2 text-center font-semibold text-slate-500 text-sm">
-                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                    </div>
-                    <div class="grid grid-cols-7 gap-2 mt-2 text-sm">
-                        <div><span class="calendar-day day-completed">2</span></div>
-                        <div><span class="calendar-day day-missed">3</span></div>
-                        <div><span class="calendar-day day-today">28</span></div>
-                    </div>
-                </section>
+                    <a href="{% url 'start_exercise' exercise.id %}" class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg text-center transition-colors">Start Exercise</a>
+                </div>
+                {% empty %}
+                <div>No exercises assigned.</div>
+                {% endfor %}
             </div>
-        </main>
+        </section>
+
+        <!-- Session Calendar -->
+        <section class="bg-white p-6 rounded-2xl shadow-md">
+            <h2 class="text-xl font-bold mb-2">Session Calendar</h2>
+            <p class="text-slate-500 mb-6">Track completed and missed sessions for a clear overview of your child's engagement.</p>
+
+            <div class="grid grid-cols-7 gap-2 text-center font-semibold text-slate-500 text-sm">
+                {% for day in days_of_week %}
+                <div>{{ day }}</div>
+                {% endfor %}
+            </div>
+            <div class="grid grid-cols-7 gap-2 mt-2 text-sm">
+                {% for cell in calendar_cells %}
+                <div>
+                    <span class="calendar-day 
+                        {% if cell.completed %}day-completed{% elif cell.missed %}day-missed{% elif cell.is_today %}day-today{% endif %}">
+                        {{ cell.day }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
     </div>
+</main>
+{% endblock %}
 
-    <script>
-        // Chart.js example config
-        const ctx = document.getElementById('weeklyProgressChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [{
-                    label: 'Overall Progress',
-                    data: [65, 70, 75, 85],
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    borderColor: 'rgba(245, 158, 11, 1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true,
-                }]
-            },
-            options: { responsive: true }
-        });
-    </script>
-</body>
-</html>
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('weeklyProgressChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ progress_chart.labels|safe }},
+            datasets: [{
+                label: 'Overall Progress',
+                data: {{ progress_chart.data|safe }},
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                borderColor: 'rgba(245, 158, 11, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+            }]
+        },
+        options: { responsive: true }
+    });
+});
+</script>
+{% endblock %}

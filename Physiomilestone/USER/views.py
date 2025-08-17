@@ -1,29 +1,24 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model,logout
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 User = get_user_model()  # get your CustomUser model
+from .forms import CustomusercreationForm
 
 def register_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        role = request.POST.get("role")
-
-        # create new user
-        User.objects.create(
-            username=username,
-            password=make_password(password),  # hash password
-            role=role
-        )
-
-        # after registration, redirect to login page
-        return redirect("login")
-
-    return render(request, "USER/register.html")
+        form=CustomusercreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("login")
+        else:
+            print(form.errors)
+    else:
+        form=CustomusercreationForm()
+    return render(request, "USER/register.html",{"form":form})
 
 def login_view(request):
     if request.method == "POST":
@@ -48,5 +43,7 @@ def login_view(request):
 
     return render(request, "USER/login.html")
 
-
+def logoutview(request):
+    logout(request)
+    return redirect("login")
         

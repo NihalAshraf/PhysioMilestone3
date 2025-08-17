@@ -8,3 +8,6 @@ class CustomUSer(AbstractUser):
         ('doctor','Doctor'),
     )
     role=models.CharField(max_length=10,choices=ROLE_CHOICES,default='child')
+    age=models.PositiveIntegerField(null=True,blank=True)
+    parent_name=models.CharField(max_length=50,blank=True)
+    contact_number=models.CharField(max_length=50,blank=True)
