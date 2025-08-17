@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 User = get_user_model()  # get your CustomUser model
 
 def register_view(request):
@@ -21,15 +24,6 @@ def register_view(request):
         return redirect("login")
 
     return render(request, "USER/register.html")
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-
-# USER/views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
 
 def login_view(request):
     if request.method == "POST":
