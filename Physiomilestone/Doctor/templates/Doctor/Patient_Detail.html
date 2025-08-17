@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details - PhysioMilestones</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Styles for the video modal */
+        .modal-overlay {
+            transition: opacity 0.2s ease-in-out;
+        }
+        .modal-container {
+            transition: transform 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">Patient Progress: <span class="text-amber-600">Aarav Sharma</span></h1>
+                <p class="text-slate-500 mt-1">Review detailed analytics, watch session videos, and provide feedback.</p>
+            </div>
+            <a href="#" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+                &larr; Back to Dashboard
+            </a>
+        </header>
+
+        <main class="space-y-8">
+            <!-- Top Section: Summary & Performance Trends -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Summary Card -->
+                <aside class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-xl font-bold mb-4">Summary</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center">
+                            <span class="text-white text-3xl font-bold">A</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">Aarav Sharma</h3>
+                            <p class="text-slate-500">Age: 6 years</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Overall Progress:</span><span class="font-bold text-lg text-green-600">85%</span></div>
+                        <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Weakest Area:</span><span class="font-bold text-lg text-red-600">Balance</span></div>
+                    </div>
+                </aside>
+
+                <!-- Performance Trends Chart -->
+                <section class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-xl font-bold mb-2">Performance Trends</h2>
+                    <p class="text-slate-500 mb-6">Key performance metrics from the latest analyzed sessions.</p>
+                    <div><canvas id="performanceTrendsChart"></canvas></div>
+                </section>
+            </div>
+
+            <!-- Session History & Video Review -->
+            <section class="bg-white p-6 sm:p-8 rounded-2xl shadow-md">
+                <h2 class="text-xl font-bold mb-2">Session History & Video Review</h2>
+                <p class="text-slate-500 mb-6">Review AI-generated reports and watch the original video uploads.</p>
+                <div class="space-y-4">
+                    
+                    <!-- Session Card 1 - Loop this with Django -->
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold">Weekly Progress Report - Squat Jumps</h3>
+                            <p class="text-sm text-slate-500">Uploaded on: 2025-07-20</p>
+                            <p class="mt-2 text-slate-700 text-sm max-w-2xl">AI Analysis: Good squat depth in 80% of reps. Stability during landing was 75% effective.</p>
+                        </div>
+                        <button onclick="openModal('path/to/video1.mp4')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors shadow-sm">Watch Video</button>
+                    </div>
+
+                    <!-- Session Card 2 -->
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold">Mid-Month Review - Arm Circles</h3>
+                            <p class="text-sm text-slate-500">Uploaded on: 2025-07-13</p>
+                            <p class="mt-2 text-slate-700 text-sm max-w-2xl">AI Analysis: Excellent arm extension and circular motion. Achieved 92% accuracy.</p>
+                        </div>
+                        <button onclick="openModal('path/to/video2.mp4')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors shadow-sm">Watch Video</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctor's Feedback & Actions -->
+            <section class="bg-white p-6 sm:p-8 rounded-2xl shadow-md">
+                <h2 class="text-xl font-bold mb-4">Feedback & Actions</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div>
+                            <label for="feedback" class="block text-sm font-medium text-slate-700">Provide Feedback to Parent</label>
+                            <textarea name="feedback" id="feedback" rows="4" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="e.g., 'Great progress on the squats, Aarav! Let's focus on balance next week.'"></textarea>
+                        </div>
+                        <div class="flex justify-end items-center space-x-4">
+                            <a href="#" class="font-semibold text-white bg-blue-500 hover:bg-blue-600 py-2 px-6 rounded-lg transition-colors">Assign New Exercise</a>
+                            <button type="submit" class="font-semibold text-white bg-amber-500 hover:bg-amber-600 py-2 px-6 rounded-lg transition-colors">Send Feedback</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="video-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="modal-container bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform scale-95">
+            <div class="flex justify-between items-center p-4 border-b border-slate-200">
+                <h3 class="text-lg font-bold">Video Review</h3>
+                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-800">&times;</button>
+            </div>
+            <div class="p-4">
+                <video id="modal-video-player" class="w-full rounded-lg" controls></video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js configuration (same as parent's view)
+        const ctx = document.getElementById('performanceTrendsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Squat Jumps', 'Arm Circles', 'Balance Beam'],
+                datasets: [
+                    { label: 'Accuracy (%)', data: [80, 92, 70], backgroundColor: 'rgba(245, 158, 11, 0.7)' },
+                    { label: 'Stability (%)', data: [75, 88, 65], backgroundColor: 'rgba(100, 116, 139, 0.7)' }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true, max: 100 } },
+                plugins: { legend: { position: 'top', align: 'end' } }
+            }
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('video-modal');
+        const modalVideoPlayer = document.getElementById('modal-video-player');
+
+        function openModal(videoSrc) {
+            modalVideoPlayer.src = videoSrc;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modalVideoPlayer.pause();
+            modalVideoPlayer.src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on escape key press
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
