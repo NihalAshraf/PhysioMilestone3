@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Using Inter as the default font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* A light gray background */
+        }
+        /* Custom style for progress bar */
+        .progress-bar-container {
+            background-color: #e5e7eb; /* gray-200 */
+            border-radius: 9999px;
+            height: 8px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background-color: #10b981; /* emerald-500 */
+            height: 100%;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Header Section -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">Doctor Dashboard</h1>
+                <p class="text-slate-500 mt-1">
+                    <!-- Replace with Django template variable -->
+                    Welcome, Dr. Anya Sharma! Here you can manage your patients and review their progress.
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+                    Upload Exercise Template
+                </a>
+                <a href="#" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+                    Logout
+                </a>
+            </div>
+        </header>
+
+        <main>
+            <!-- My Patients List -->
+            <section class="bg-white p-6 sm:p-8 rounded-2xl shadow-md">
+                <h2 class="text-xl font-bold mb-2">My Patients</h2>
+                <p class="text-slate-500 mb-6">A comprehensive list of children assigned to you, with an overview of their overall progress.</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="border-b-2 border-slate-200">
+                            <tr>
+                                <th class="p-4 text-sm font-semibold text-slate-500 uppercase">Child Name</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 uppercase">Age</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 uppercase">Overall Progress</th>
+                                <th class="p-4 text-sm font-semibold text-slate-500 uppercase text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 
+                                Use a Django for loop here to iterate through patients.
+                                Example: {% for patient in patients %}
+                            -->
+
+                            <!-- Patient Row 1 -->
+                            <tr class="border-b border-slate-100">
+                                <td class="p-4 font-semibold">Aarav Sharma</td>
+                                <td class="p-4 text-slate-600">6</td>
+                                <td class="p-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-24 progress-bar-container">
+                                            <div class="progress-bar" style="width: 85%;"></div>
+                                        </div>
+                                        <span class="text-sm font-semibold text-slate-600">85%</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 text-right">
+                                    <a href="#" class="bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <!-- Patient Row 2 -->
+                            <tr class="border-b border-slate-100">
+                                <td class="p-4 font-semibold">Priya Singh</td>
+                                <td class="p-4 text-slate-600">7</td>
+                                <td class="p-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-24 progress-bar-container">
+                                            <div class="progress-bar" style="width: 78%;"></div>
+                                        </div>
+                                        <span class="text-sm font-semibold text-slate-600">78%</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 text-right">
+                                    <a href="#" class="bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <!-- Patient Row 3 -->
+                            <tr class="border-b border-slate-100">
+                                <td class="p-4 font-semibold">Rahul Kumar</td>
+                                <td class="p-4 text-slate-600">5</td>
+                                <td class="p-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-24 progress-bar-container">
+                                            <div class="progress-bar" style="width: 62%;"></div>
+                                        </div>
+                                        <span class="text-sm font-semibold text-slate-600">62%</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 text-right">
+                                    <a href="#" class="bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <!-- End Django for loop: {% endfor %} -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>
