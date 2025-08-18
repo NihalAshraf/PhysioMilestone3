@@ -25,7 +25,7 @@
                 <h1 class="text-3xl font-bold text-slate-900">Create New Exercise Template</h1>
                 <p class="text-slate-500 mt-1">Add a new exercise to the system's library to make it available for all doctors.</p>
             </div>
-            <a href="#" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+            <a href="{% url 'ddashboard' %}" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
                 &larr; Back to Dashboard
             </a>
         </header>
@@ -38,8 +38,8 @@
                         
                         <!-- Exercise Name -->
                         <div>
-                            <label for="exercise_name" class="block text-sm font-medium text-slate-700">Exercise Name</label>
-                            <input type="text" name="exercise_name" id="exercise_name" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="e.g., High Knees" required>
+                            <label for="name" class="block text-sm font-medium text-slate-700">Exercise Name</label>
+                            <input type="text" name="name" id="name" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="e.g., High Knees" required>
                         </div>
 
                         <!-- Description -->
@@ -61,14 +61,14 @@
                                 <span class="inline-flex items-center px-3 text-sm text-slate-500 bg-slate-100 border border-r-0 border-slate-300 rounded-l-md">
                                     youtube.com/embed/
                                 </span>
-                                <input type="text" name="youtube_id" id="youtube_id" class="block w-full flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-none rounded-r-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="5xv0DKqe5XQ" required>
+                                <input type="text" name="youtube_id" id="youtube_id" class="block w-full flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-none rounded-r-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="5xv0DKqe5XQ">
                             </div>
                              <p class="mt-2 text-xs text-slate-500">Only the ID from the YouTube URL is needed (e.g., the '5xv0DKqe5XQ' part).</p>
                         </div>
                         
                         <!-- Form Actions -->
                         <div class="flex justify-end items-center space-x-4 pt-4">
-                            <a href="#" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg transition-colors">
+                            <a href="{% url 'ddashboard' %}" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg transition-colors">
                                 Cancel
                             </a>
                             <button type="submit" class="font-semibold text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 py-2 px-6 rounded-lg transition-colors">

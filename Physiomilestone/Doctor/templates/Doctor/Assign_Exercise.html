@@ -25,7 +25,7 @@
                 <h1 class="text-3xl font-bold text-slate-900">Assign New Exercise</h1>
                 <p class="text-slate-500 mt-1">Select a patient, choose an exercise, and set the goals for the session.</p>
             </div>
-            <a href="#" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+            <a href="{% url "ddashboard" %}" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
                 &larr; Back to Patient Details
             </a>
         </header>
@@ -43,23 +43,26 @@
                                 This select menu should be populated with the doctor's patients.
                                 The patient from the previous page could be pre-selected.
                             -->
-                            <select name="patient" id="patient" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition">
-                                <option value="1">Aarav Sharma</option>
-                                <option value="2">Priya Singh</option>
-                                <option value="3">Rahul Kumar</option>
-                            </select>
-                        </div>
+                            <select name="patient" id="patient" 
+                                class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition">
 
+                            <option value="">-- Select Patient --</option>
+                                {% for p in patient %}
+                                    <option value="{{ p.id }}">{{ p.first_name }} {{ p.last_name }}</option>
+                                {% endfor %}
+                            </select>
                         <!-- Exercise Selection -->
                         <div>
                             <label for="exercise" class="block text-sm font-medium text-slate-700">Select Exercise</label>
-                            <!-- This should be populated from your Exercise model -->
-                            <select name="exercise" id="exercise" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition">
-                                <option value="sq">Squat Jumps</option>
-                                <option value="ac">Arm Circles</option>
-                                <option value="bbw">Balance Beam Walk</option>
+                            <select name="exercise" id="exercise"
+                                class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition">
+                            <option value="">-- Select an Exercise --</option>
+                                {% for exercise in exercises %}
+                                    <option value="{{ exercise.id }}">{{ exercise.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
+
 
                         <!-- Reps and Sets -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
