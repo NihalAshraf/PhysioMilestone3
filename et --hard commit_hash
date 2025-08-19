@@ -1,0 +1,24 @@
+[33m4502f0f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m154d538[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{1}: reset: moving to HEAD~1
+[33m53db2be[m HEAD@{2}: commit: kl
+[33m154d538[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{3}: commit: daas
+[33m4502f0f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{4}: commit: da
+[33m0e8426a[m HEAD@{5}: commit: do
+[33m2aa3eb8[m HEAD@{6}: commit (merge): child
+[33mde81ad5[m HEAD@{7}: commit: s
+[33mc27ec7c[m HEAD@{8}: commit (merge): p
+[33m60d8f00[m HEAD@{9}: commit: cd
+[33m584503f[m HEAD@{10}: commit (merge): c
+[33m5f8c50f[m HEAD@{11}: reset: moving to HEAD
+[33m5f8c50f[m HEAD@{12}: commit: c
+[33m08bda70[m HEAD@{13}: reset: moving to HEAD~1
+[33m1ae8683[m HEAD@{14}: reset: moving to HEAD~1
+[33mf6e2334[m HEAD@{15}: commit: css
+[33m1ae8683[m HEAD@{16}: commit: po
+[33m08bda70[m HEAD@{17}: commit: temp
+[33m429a25e[m HEAD@{18}: commit: 1
+[33m79713f8[m HEAD@{19}: pull: Fast-forward
+[33mfde1341[m HEAD@{20}: commit: 11
+[33md4ed247[m HEAD@{21}: commit: l
+[33m9754502[m HEAD@{22}: commit: initial
+[33m5ad211c[m HEAD@{23}: clone: from https://github.com/mmuzammil2003/Physiomilestone.git
