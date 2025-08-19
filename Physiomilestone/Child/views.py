@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
+from Doctor.models import AssignExercise
 
 # Create your views here.
 class DashboardView(TemplateView):
@@ -17,6 +18,12 @@ class DashboardView(TemplateView):
 
 class ExerciseView(TemplateView):
     template_name="child/Exercise_Instructions.html"
+
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        assigned_exercise=AssignExercise.objects.filter(Patient_name=self.request.user).last()
+        context["assigned_exercise"]=assigned_exercise
+        return context
 
 class ProfileView(TemplateView):
     template_name="child/Profile_Edit.html"

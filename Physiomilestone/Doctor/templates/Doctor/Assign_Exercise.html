@@ -25,13 +25,30 @@
                 <h1 class="text-3xl font-bold text-slate-900">Assign New Exercise</h1>
                 <p class="text-slate-500 mt-1">Select a patient, choose an exercise, and set the goals for the session.</p>
             </div>
-            <a href="{% url "ddashboard" %}" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+            <a href="{% url 'ddashboard' %}" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
                 &larr; Back to Patient Details
             </a>
         </header>
 
         <main class="max-w-2xl mx-auto">
             <section class="bg-white p-6 sm:p-8 rounded-2xl shadow-md">
+
+                <!-- ✅ Success / Error Messages -->
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-lg text-sm font-medium
+                            {% if message.tags == 'success' %} bg-green-100 text-green-800 border border-green-300
+                            {% elif message.tags == 'error' %} bg-red-100 text-red-800 border border-red-300
+                            {% else %} bg-blue-100 text-blue-800 border border-blue-300
+                            {% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Form -->
                 <form method="post">
                     {% csrf_token %}
                     <div class="space-y-6">
@@ -39,40 +56,36 @@
                         <!-- Patient Selection -->
                         <div>
                             <label for="patient" class="block text-sm font-medium text-slate-700">Select Patient</label>
-                            <!-- 
-                                This select menu should be populated with the doctor's patients.
-                                The patient from the previous page could be pre-selected.
-                            -->
-                            <select name="patient" id="patient" 
+                            <select name="patient" id="patient" required
                                 class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition">
-
-                            <option value="">-- Select Patient --</option>
-                                {% for p in patient %}
+                                <option value="">-- Select Patient --</option>
+                                {% for p in patients %}
                                     <option value="{{ p.id }}">{{ p.first_name }} {{ p.last_name }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+
                         <!-- Exercise Selection -->
                         <div>
                             <label for="exercise" class="block text-sm font-medium text-slate-700">Select Exercise</label>
-                            <select name="exercise" id="exercise"
+                            <select name="exercise" id="exercise" required
                                 class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition">
-                            <option value="">-- Select an Exercise --</option>
+                                <option value="">-- Select an Exercise --</option>
                                 {% for exercise in exercises %}
                                     <option value="{{ exercise.id }}">{{ exercise.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
 
-
                         <!-- Reps and Sets -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                                 <label for="reps" class="block text-sm font-medium text-slate-700">Target Reps</label>
-                                <input type="number" name="reps" id="reps" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="e.g., 10" required>
+                                <input type="number" name="reps" id="reps" min="1" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="e.g., 10" required>
                             </div>
                             <div>
                                 <label for="sets" class="block text-sm font-medium text-slate-700">Target Sets</label>
-                                <input type="number" name="sets" id="sets" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="e.g., 3" required>
+                                <input type="number" name="sets" id="sets" min="1" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition" placeholder="e.g., 3" required>
                             </div>
                         </div>
 
@@ -84,7 +97,7 @@
 
                         <!-- Form Actions -->
                         <div class="flex justify-end items-center space-x-4 pt-4">
-                            <a href="#" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg transition-colors">
+                            <a href="{% url 'ddashboard' %}" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-2 px-4 rounded-lg transition-colors">
                                 Cancel
                             </a>
                             <button type="submit" class="font-semibold text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 py-2 px-6 rounded-lg transition-colors">
@@ -97,5 +110,14 @@
         </main>
     </div>
 
+    <!-- ✅ Clear form after success -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const alertBox = document.querySelector(".bg-green-100");
+            if (alertBox) {
+                document.querySelector("form").reset();
+            }
+        });
+    </script>
 </body>
 </html>

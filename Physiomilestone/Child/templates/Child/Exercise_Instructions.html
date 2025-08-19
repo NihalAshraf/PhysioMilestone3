@@ -5,9 +5,12 @@
 
 {% block content %}
 <main class="w-full max-w-4xl bg-white p-8 rounded-2xl shadow-md mx-auto">
+    {% if assigned_exercise %}
     <!-- Header -->
     <header class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-slate-900">How to do Squat Jumps</h1>
+        <h1 class="text-3xl font-bold text-slate-900">
+            How to do {{ assigned_exercise.Exercise.name }}
+        </h1>
         <p class="text-slate-500 mt-1">
             Watch the video and read the instructions carefully before you begin.
         </p>
@@ -16,26 +19,29 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <!-- Left Panel: YouTube Video Embed -->
         <div class="aspect-video rounded-xl overflow-hidden shadow-lg">
-            <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube.com/embed/5xv0DKqe5XQ?si=hVAvReOO-TtSYIyU" 
-                title="YouTube video player" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen>
-            </iframe>
+            {% if assigned_exercise.Exercise.youtube_id %}
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://www.youtube.com/embed/{{ assigned_exercise.Exercise.youtube_id }}" 
+                    title="Exercise Video" 
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            {% else %}
+                <p class="text-center text-slate-500">No video available.</p>
+            {% endif %}
         </div>
 
         <!-- Right Panel: Instructions & Action Button -->
         <div class="space-y-6">
             <div>
                 <h2 class="text-xl font-bold mb-2">Instructions</h2>
+                <p class="text-slate-600">{{ assigned_exercise.instruction }}</p>
                 <ul class="list-disc list-inside space-y-2 text-slate-600">
-                    <li>Stand with your feet shoulder-width apart.</li>
-                    <li>Lower your body into a squat position.</li>
-                    <li>Jump up explosively.</li>
-                    <li>Land softly and return to the squat position.</li>
+                    <li>Reps: {{ assigned_exercise.reps }}</li>
+                    <li>Sets: {{ assigned_exercise.sets }}</li>
                 </ul>
             </div>
             <div class="text-center">
@@ -46,6 +52,9 @@
             </div>
         </div>
     </div>
+    {% else %}
+        <p class="text-center text-slate-500">No exercise assigned yet.</p>
+    {% endif %}
 </main>
 
 <footer class="mt-8 text-center">
