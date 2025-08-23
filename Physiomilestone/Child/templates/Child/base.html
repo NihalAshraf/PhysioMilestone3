@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Child Portal{% endblock %}</title>
+    <title>{% block title %}PhysioMilestones{% endblock %}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -15,67 +15,68 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Chart.js for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Your app CSS -->
-    <link rel="stylesheet" href="{% static 'Child/dashboard.css' %}">
     <style>
-        .avatar-sm {
-            width: 40px;
-            height: 40px;
-        }
-        .avatar-lg {
-            width: 80px;
-            height: 80px;
+        body {
+            font-family: 'Inter', sans-serif;
         }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100 text-slate-800">
+<!-- 
+  FIX 1: Added 'min-h-screen flex flex-col' to the body.
+  - 'min-h-screen': Ensures the body takes up at least the full height of the viewport.
+  - 'flex flex-col': Makes the body a vertical flex container, allowing us to push the footer down.
+-->
+<body class="bg-gray-100 text-slate-800 min-h-screen flex flex-col">
 
     <!-- Navbar -->
-    <nav class="bg-white shadow px-8 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-6">
-            <a href="{% url 'cdashboard' %}" class="text-2xl font-bold text-amber-500">Child Portal</a>
-            <a href="{% url 'cdashboard' %}" class="font-semibold text-slate-700 hover:text-amber-500">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
-            </a>
-            <a href="{% url 'instruction' %}" class="font-semibold text-slate-700 hover:text-amber-500">
-                <i class="fas fa-dumbbell"></i> Exercises
-            </a>
-            <a href="{% url 'uploadexecise' %}" class="font-semibold text-slate-700 hover:text-amber-500">
-                <i class="fas fa-upload"></i> Upload
-            </a>
-            <a href="{% url 'progress' %}" class="font-semibold text-slate-700 hover:text-amber-500">
-                <i class="fas fa-chart-line"></i> Progress
-            </a>
-            <a href="{% url 'doctor_list' %}" class="font-semibold text-slate-700 hover:text-amber-500">
-                <i class="fas fa-user-md"></i> Doctors
-            </a>
-            <a href="{% url 'consultation_list' %}" class="font-semibold text-slate-700 hover:text-amber-500">
-                <i class="fas fa-comments"></i> Consultations
-                {% if pending_consultations %}
-                    <span class="bg-red-500 text-white rounded-full px-2 py-1 text-xs">{{ pending_consultations }}</span>
-                {% endif %}
-            </a>
-            <a href="{% url 'profile' %}" class="font-semibold text-slate-700 hover:text-amber-500">
-                <i class="fas fa-user"></i> Profile
-            </a>
+    <nav class="bg-white shadow-md px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <a href="{% url 'cdashboard' %}" class="text-2xl font-bold text-amber-500">PhysioMilestones</a>
+            <!-- Navigation links can be put into a dropdown on smaller screens if needed -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="{% url 'cdashboard' %}" class="font-semibold text-slate-700 hover:text-amber-500 transition-colors"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+                <a href="{% url 'instruction' %}" class="font-semibold text-slate-700 hover:text-amber-500 transition-colors"><i class="fas fa-dumbbell mr-1"></i>Exercises</a>
+                <a href="{% url 'uploadexecise' %}" class="font-semibold text-slate-700 hover:text-amber-500 transition-colors"><i class="fas fa-upload mr-1"></i>Upload</a>
+                <a href="{% url 'progress' %}" class="font-semibold text-slate-700 hover:text-amber-500 transition-colors"><i class="fas fa-chart-line mr-1"></i>Progress</a>
+                <a href="{% url 'doctor_list' %}" class="font-semibold text-slate-700 hover:text-amber-500 transition-colors"><i class="fas fa-user-md mr-1"></i>Doctors</a>
+                <a href="{% url 'consultation_list' %}" class="font-semibold text-slate-700 hover:text-amber-500 transition-colors flex items-center">
+                    <i class="fas fa-comments mr-1"></i>Consultations
+                    {% if pending_consultations %}
+                        <span class="ml-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">{{ pending_consultations }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'profile' %}" class="font-semibold text-slate-700 hover:text-amber-500 transition-colors"><i class="fas fa-user mr-1"></i>Profile</a>
+            </div>
         </div>
         <div>
-            <a href="{% url 'logout' %}" 
-               class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
-               <i class="fas fa-sign-out-alt"></i> Logout
+            <a href="{% url 'logout' %}" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center">
+               <i class="fas fa-sign-out-alt mr-2"></i>Logout
             </a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8 min-h-[60vh]">
+    <!-- 
+      FIX 2: Added 'flex-grow' to the main content area.
+      - This class tells the main element to expand and fill all available vertical space,
+        which pushes the footer to the bottom of the page.
+      - Removed the 'min-h-[60vh]' as it's no longer necessary.
+    -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
         {% if messages %}
-            <div class="mb-4">
+            <div class="mb-4 space-y-2">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <!-- FIX 3: Converted Bootstrap alerts to Tailwind CSS for consistency -->
+                    <div class="
+                        {% if message.tags == 'success' %} bg-green-100 border-green-400 text-green-700 
+                        {% elif message.tags == 'error' %} bg-red-100 border-red-400 text-red-700 
+                        {% elif message.tags == 'warning' %} bg-yellow-100 border-yellow-400 text-yellow-700 
+                        {% else %} bg-blue-100 border-blue-400 text-blue-700 {% endif %} 
+                        border px-4 py-3 rounded-lg relative flex justify-between items-center" 
+                        role="alert"
+                        x-data="{ show: true }" x-show="show" x-transition>
+                        <span>{{ message }}</span>
+                        <button type="button" @click="show = false" class="ml-4">&times;</button>
                     </div>
                 {% endfor %}
             </div>
@@ -87,10 +88,12 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white text-center py-4 text-sm text-slate-400 shadow mt-auto">
-        &copy; 2025 Child Portal. All rights reserved.
+    <footer class="bg-white text-center py-4 text-sm text-slate-500 shadow-inner mt-auto">
+        &copy; {% now "Y" %} PhysioMilestones. All rights reserved.
     </footer>
 
+    <!-- Alpine.js for simple interactivity like closing alerts -->
+    <script src="//unpkg.com/alpinejs" defer></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
