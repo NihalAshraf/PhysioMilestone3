@@ -12,12 +12,67 @@
             </p>
         </div>
         <div class="flex items-center space-x-4">
-            <a href="#" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
+            <a href="{% url 'uploadexercise' %}" 
+               class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors">
                 Upload Exercise Template
             </a>
         </div>
     </header>
 
+    <!-- Quick Stats -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Total Patients -->
+        <div class="bg-gradient-to-r from-amber-100 to-amber-200 p-6 rounded-2xl shadow-md text-center">
+            <h3 class="text-lg font-semibold text-amber-700">Total Patients</h3>
+            <p class="text-3xl font-bold text-amber-800">{{ total_patients }}</p>
+        </div>
+
+        <!-- Pending Consultations -->
+        <div class="bg-gradient-to-r from-red-100 to-red-200 p-6 rounded-2xl shadow-md text-center">
+            <h3 class="text-lg font-semibold text-red-700">Pending Consultations</h3>
+            <p class="text-3xl font-bold text-red-800">{{ pending_consultations }}</p>
+        </div>
+
+        <!-- Today's Progress Reports -->
+        <div class="bg-gradient-to-r from-green-100 to-green-200 p-6 rounded-2xl shadow-md text-center">
+            <h3 class="text-lg font-semibold text-green-700">Today's Progress Reports</h3>
+            <p class="text-3xl font-bold text-green-800">{{ today_progress }}</p>
+        </div>
+
+        <!-- Recent Assignments -->
+        <div class="bg-gradient-to-r from-blue-100 to-blue-200 p-6 rounded-2xl shadow-md text-center">
+            <h3 class="text-lg font-semibold text-blue-700">Recent Assignments</h3>
+            <p class="text-3xl font-bold text-blue-800">{{ recent_assignments|length }}</p>
+        </div>
+    </section>
+
+    <!-- Recent Assignments -->
+    <section class="bg-white p-6 sm:p-8 rounded-2xl shadow-md mb-8">
+        <h2 class="text-xl font-bold mb-4">Recent Exercise Assignments</h2>
+        <ul class="divide-y divide-slate-200">
+            {% for assign in recent_assignments %}
+            <li class="py-3 flex justify-between items-center">
+                <div>
+                    <p class="font-semibold">
+                        {{ assign.Exercise.name }} → {{ assign.Patient_name.first_name }} {{ assign.Patient_name.last_name }}
+                    </p>
+                    <p class="text-sm text-slate-500">Assigned on {{ assign.assigned_on|date:"Y-m-d H:i" }}</p>
+                </div>
+                {% if assign.is_active %}
+                    <span class="px-3 py-1 text-sm bg-amber-100 text-amber-700 rounded-lg">Active</span>
+                {% elif assign.completed %}
+                    <span class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-lg">Completed</span>
+                {% else %}
+                    <span class="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded-lg">Inactive</span>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li class="py-3 text-slate-500">No recent assignments.</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <!-- My Patients -->
     <section class="bg-white p-6 sm:p-8 rounded-2xl shadow-md">
         <h2 class="text-xl font-bold mb-2">My Patients</h2>
         <p class="text-slate-500 mb-6">A comprehensive list of children assigned to you, with an overview of their overall progress.</p>
@@ -35,18 +90,19 @@
                 <tbody>
                     {% for patient in patients %}
                     <tr class="border-b border-slate-100">
-                        <td class="p-4 font-semibold">{{ patient.name }}</td>
+                        <td class="p-4 font-semibold">{{ patient.first_name }} {{ patient.last_name }}</td>
                         <td class="p-4 text-slate-600">{{ patient.age }}</td>
                         <td class="p-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-24 progress-bar-container">
-                                    <div class="progress-bar" style="width: {{ patient.progress }}%;"></div>
+                                <div class="w-24 bg-slate-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-amber-500 h-2" style="width: {{ patient.progress|default:0 }}%;"></div>
                                 </div>
-                                <span class="text-sm font-semibold text-slate-600">{{ patient.progress }}%</span>
+                                <span class="text-sm font-semibold text-slate-600">{{ patient.progress|default:"0" }}%</span>
                             </div>
                         </td>
                         <td class="p-4 text-right">
-                            <a href="#" class="bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+                            <a href="{% url 'patient_detail' patient.id %}" 
+                               class="bg-amber-100 text-amber-800 hover:bg-amber-200 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
                                 View Details
                             </a>
                         </td>

@@ -4,95 +4,93 @@
 {% block title %}Available Doctors{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">
-                        <i class="fas fa-user-md"></i> Available Doctors
-                        <span class="badge badge-primary ml-2">{{ total_doctors }}</span>
-                    </h4>
+<div class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Header -->
+    <header class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Available Doctors
+            <span class="ml-4 bg-amber-100 text-amber-800 text-sm font-semibold px-3 py-1 rounded-full">{{ total_doctors }}</span>
+        </h1>
+        <p class="text-slate-500 mt-1">Find a specialist and request a consultation to get started.</p>
+    </header>
+
+    {% if doctors %}
+        <!-- Doctors Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for doctor in doctors %}
+            <div class="bg-white rounded-2xl shadow-md p-6 flex flex-col text-center items-center transition-transform transform hover:-translate-y-1">
+                <!-- Avatar -->
+                <div class="w-24 h-24 bg-amber-500 rounded-full flex items-center justify-center mb-4">
+                    <span class="text-white text-4xl font-bold">
+                        {{ doctor.first_name|first }}{{ doctor.last_name|first }}
+                    </span>
                 </div>
-                <div class="card-body">
-                    {% if doctors %}
-                        <div class="row">
-                            {% for doctor in doctors %}
-                            <div class="col-md-6 col-lg-4 mb-4">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-body text-center">
-                                        <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
-                                            <span class="text-white font-weight-bold" style="font-size: 2rem;">
-                                                {{ doctor.first_name|first }}{{ doctor.last_name|first }}
-                                            </span>
-                                        </div>
-                                        <h5 class="card-title">{{ doctor.first_name }} {{ doctor.last_name }}</h5>
-                                        <p class="text-muted mb-2">{{ doctor.email }}</p>
-                                        
-                                        <div class="row text-center mb-3">
-                                            <div class="col-6">
-                                                <small class="text-muted">Contact</small>
-                                                <p class="mb-0">{{ doctor.contact_number|default:"N/A" }}</p>
-                                            </div>
-                                            <div class="col-6">
-                                                <small class="text-muted">Experience</small>
-                                                <p class="mb-0">Available</p>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="d-grid">
-                                            <a href="{% url 'consultation_request' doctor.pk %}" 
-                                               class="btn btn-primary">
-                                                <i class="fas fa-comments"></i> Request Consultation
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <!-- Pagination -->
-                        {% if is_paginated %}
-                        <nav aria-label="Doctor pagination">
-                            <ul class="pagination justify-content-center">
-                                {% if page_obj.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=1">&laquo; First</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                                    </li>
-                                {% endif %}
-                                
-                                <li class="page-item active">
-                                    <span class="page-link">
-                                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                                    </span>
-                                </li>
-                                
-                                {% if page_obj.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                        {% endif %}
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No doctors available</h5>
-                            <p class="text-muted">Please check back later for available doctors.</p>
-                        </div>
-                    {% endif %}
+                
+                <!-- Doctor Info -->
+                <h2 class="text-xl font-bold text-slate-800">Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h2>
+                <p class="text-slate-500 text-sm">{{ doctor.email }}</p>
+
+                <!-- Details -->
+                <div class="w-full border-t border-slate-100 my-4"></div>
+                <div class="w-full flex justify-around text-sm">
+                    <div>
+                        <p class="text-slate-400 font-semibold">CONTACT</p>
+                        <p class="text-slate-600 font-medium">{{ doctor.contact_number|default:"N/A" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 font-semibold">EXPERIENCE</p>
+                        <p class="text-slate-600 font-medium">5+ Years</p> {# Placeholder #}
+                    </div>
                 </div>
+                <div class="w-full border-t border-slate-100 my-4"></div>
+
+                <!-- Action Button -->
+                <a href="{% url 'consultation_request' doctor.pk %}" 
+                   class="w-full mt-2 inline-flex items-center justify-center py-3 px-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg shadow-sm transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.839 8.839 0 01-4.082-.978L4 17.632V13.5A7.002 7.002 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.415 11.691A5.99 5.99 0 0010 15.5c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6c0 1.314.426 2.523 1.148 3.512l-.214.852.214-.852z" clip-rule="evenodd" />
+                    </svg>
+                    Request Consultation
+                </a>
             </div>
+            {% endfor %}
         </div>
-    </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Doctor pagination" class="mt-12">
+            <ul class="flex justify-center items-center space-x-2">
+                {% if page_obj.has_previous %}
+                    <li><a href="?page=1" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50">&laquo;</a></li>
+                    <li><a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50">Previous</a></li>
+                {% endif %}
+                
+                <li class="px-4 py-2 bg-amber-500 border border-amber-500 rounded-lg text-white">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </li>
+                
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50">Next</a></li>
+                    <li><a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <!-- No Doctors Available -->
+        <div class="text-center py-16">
+            <div class="inline-block bg-slate-100 p-6 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+            </div>
+            <h2 class="mt-6 text-2xl font-bold text-slate-800">No Doctors Available</h2>
+            <p class="mt-2 text-slate-500">Please check back later for available doctors.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
-
