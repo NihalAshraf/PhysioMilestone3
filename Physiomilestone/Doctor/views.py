@@ -186,10 +186,18 @@ class PatientProgressView(DetailView):
             accuracies.append(video.overall_score)
             reps_completed.append(video.total_reps)
         
+        # Calculate totals
+        total_reps = sum(reps_completed) if reps_completed else 0
+        total_accuracy = sum(accuracies) if accuracies else 0
+        avg_accuracy = total_accuracy / len(accuracies) if accuracies else 0
+        
         context["chart_data"] = {
             "dates": dates,
             "accuracies": accuracies,
-            "reps_completed": reps_completed
+            "reps_completed": reps_completed,
+            "total_reps": total_reps,
+            "total_accuracy": total_accuracy,
+            "avg_accuracy": round(avg_accuracy, 2)
         }
         
         # Get exercise type breakdown

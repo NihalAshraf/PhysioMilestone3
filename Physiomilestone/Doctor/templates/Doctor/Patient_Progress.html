@@ -53,8 +53,8 @@
                                 <div class="card-body text-center">
                                     <h5>Total Reps</h5>
                                     <h3>
-                                        {% if chart_data.reps_completed %}
-                                            {{ chart_data.reps_completed|sum }}
+                                        {% if chart_data.total_reps %}
+                                            {{ chart_data.total_reps }}
                                         {% else %}
                                             0
                                         {% endif %}
@@ -239,3 +239,4 @@ const exerciseChart = new Chart(exerciseCtx, {
 });
 </script>
 {% endblock %}
+

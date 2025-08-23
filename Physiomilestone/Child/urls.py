@@ -15,6 +15,7 @@ urlpatterns = [
     
     # Video upload and processing endpoints
     path("upload-video/", views.VideoUploadView.as_view(), name="upload_video"),
+    path("test-upload/", views.TestUploadView.as_view(), name="test_upload"),
     path("video-status/<int:video_id>/", views.VideoStatusView.as_view(), name="video_status"),
     path("exercise-results/<int:video_id>/", views.ExerciseResultsView.as_view(), name="exercise_results"),
 ]

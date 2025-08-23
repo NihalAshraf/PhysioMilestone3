@@ -100,7 +100,134 @@ class progressView(TemplateView):
             context["overall_accuracy"] = round(avg_accuracy, 2)
         else:
             context["overall_accuracy"] = 0
+        
+        # Get recent videos for performance trends
+        recent_videos = videos[:10]  # Last 10 videos
+        
+        # Prepare data for performance trends chart
+        exercise_names = []
+        accuracy_scores = []
+        reps_completed = []
+        dates = []
+        
+        for video in recent_videos:
+            exercise_names.append(video.assignment.Exercise.name)
+            accuracy_scores.append(video.overall_score)
+            reps_completed.append(video.total_reps)
+            dates.append(video.uploaded_at.strftime('%Y-%m-%d'))
+        
+        context["chart_data"] = {
+            "exercise_names": exercise_names,
+            "accuracy_scores": accuracy_scores,
+            "reps_completed": reps_completed,
+            "dates": dates
+        }
+        
+        # Calculate exercise type breakdown for pie chart
+        exercise_types = {}
+        for video in videos:
+            exercise_name = video.assignment.Exercise.name
+            if exercise_name not in exercise_types:
+                exercise_types[exercise_name] = {
+                    'count': 0,
+                    'total_accuracy': 0,
+                    'total_reps': 0
+                }
+            exercise_types[exercise_name]['count'] += 1
+            exercise_types[exercise_name]['total_accuracy'] += video.overall_score
+            exercise_types[exercise_name]['total_reps'] += video.total_reps
+        
+        # Calculate averages and prepare pie chart data
+        pie_chart_labels = []
+        pie_chart_data = []
+        pie_chart_colors = [
+            'rgba(245, 158, 11, 0.8)',   # Amber
+            'rgba(59, 130, 246, 0.8)',   # Blue
+            'rgba(16, 185, 129, 0.8)',   # Green
+            'rgba(239, 68, 68, 0.8)',    # Red
+            'rgba(139, 92, 246, 0.8)',   # Purple
+            'rgba(251, 146, 60, 0.8)',   # Orange
+        ]
+        
+        for i, (exercise_name, stats) in enumerate(exercise_types.items()):
+            pie_chart_labels.append(exercise_name)
+            pie_chart_data.append(stats['count'])
+            stats['avg_accuracy'] = round(stats['total_accuracy'] / stats['count'], 2)
+        
+        context["pie_chart_data"] = {
+            "labels": pie_chart_labels,
+            "data": pie_chart_data,
+            "colors": pie_chart_colors[:len(pie_chart_labels)]
+        }
+        
+        # Get weekly progress data for line chart
+        from datetime import datetime, timedelta
+        import calendar
+        
+        # Get last 4 weeks of data
+        weekly_data = []
+        weekly_labels = []
+        
+        for i in range(4):
+            week_start = datetime.now().date() - timedelta(weeks=i+1)
+            week_end = week_start + timedelta(days=6)
             
+            week_videos = videos.filter(
+                uploaded_at__date__gte=week_start,
+                uploaded_at__date__lte=week_end
+            )
+            
+            if week_videos.exists():
+                week_avg_accuracy = sum(v.overall_score for v in week_videos) / week_videos.count()
+                weekly_data.append(round(week_avg_accuracy, 2))
+            else:
+                weekly_data.append(0)
+            
+            weekly_labels.append(f"Week {4-i}")
+        
+        # Reverse to show chronological order
+        weekly_data.reverse()
+        weekly_labels.reverse()
+        
+        context["weekly_data"] = {
+            "labels": weekly_labels,
+            "data": weekly_data
+        }
+        
+        # Calculate performance metrics
+        if videos.exists():
+            total_reps = sum(v.total_reps for v in videos)
+            total_sets = sum(v.total_sets for v in videos)
+            best_exercise = max(exercise_types.items(), key=lambda x: x[1]['avg_accuracy'])
+            weakest_exercise = min(exercise_types.items(), key=lambda x: x[1]['avg_accuracy'])
+            
+            context["performance_metrics"] = {
+                "total_reps": total_reps,
+                "total_sets": total_sets,
+                "total_sessions": sessions.count(),
+                "best_exercise": best_exercise[0],
+                "best_score": best_exercise[1]['avg_accuracy'],
+                "weakest_exercise": weakest_exercise[0],
+                "weakest_score": weakest_exercise[1]['avg_accuracy']
+            }
+        else:
+            context["performance_metrics"] = {
+                "total_reps": 0,
+                "total_sets": 0,
+                "total_sessions": 0,
+                "best_exercise": "None",
+                "best_score": 0,
+                "weakest_exercise": "None",
+                "weakest_score": 0
+            }
+        
+        # Get assigned doctor information
+        current_assignment = AssignExercise.objects.filter(Patient_name=user).last()
+        if current_assignment:
+            context["assigned_doctor"] = "Dr. " + current_assignment.Exercise.name  # Placeholder
+        else:
+            context["assigned_doctor"] = "Not assigned"
+        
         return context
 
 @method_decorator(login_required, name='dispatch')
@@ -191,6 +318,18 @@ class ConsultationDetailView(DetailView):
         return Consultation.objects.filter(child=self.request.user)
 
 @method_decorator(login_required, name='dispatch')
+class TestUploadView(View):
+    """Simple test view to verify upload endpoint is working."""
+    
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({
+            'success': True,
+            'message': 'Upload endpoint is accessible',
+            'user': request.user.username,
+            'has_assigned_exercise': AssignExercise.objects.filter(Patient_name=request.user).exists()
+        })
+
+@method_decorator(login_required, name='dispatch')
 class VideoUploadView(View):
     """Handle video upload and exercise validation."""
     
@@ -199,17 +338,30 @@ class VideoUploadView(View):
             # Get the uploaded video file
             video_file = request.FILES.get('video')
             if not video_file:
+                logger.error("No video file provided in request")
                 return JsonResponse({
                     'success': False,
                     'error': 'No video file provided'
                 })
             
+            # Log file information for debugging
+            logger.info(f"Video file received: {video_file.name}, size: {video_file.size}, type: {video_file.content_type}")
+            
             # Validate file type
             allowed_types = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv']
             if video_file.content_type not in allowed_types:
+                logger.error(f"Invalid file type: {video_file.content_type}")
                 return JsonResponse({
                     'success': False,
                     'error': 'Invalid file type. Please upload MP4, AVI, MOV, or WMV files.'
+                })
+            
+            # Validate file size (100MB limit)
+            if video_file.size > 100 * 1024 * 1024:  # 100MB in bytes
+                logger.error(f"File too large: {video_file.size} bytes")
+                return JsonResponse({
+                    'success': False,
+                    'error': 'File size too large. Please upload a video smaller than 100MB.'
                 })
             
             # Get current assigned exercise
@@ -218,6 +370,7 @@ class VideoUploadView(View):
             ).last()
             
             if not assigned_exercise:
+                logger.error(f"No exercise assigned for user: {request.user.id}")
                 return JsonResponse({
                     'success': False,
                     'error': 'No exercise assigned. Please contact your doctor.'
@@ -232,6 +385,8 @@ class VideoUploadView(View):
                 processing_status='processing'
             )
             
+            logger.info(f"ExerciseVideo created with ID: {exercise_video.id}")
+            
             # Start processing in background (you might want to use Celery for this)
             self.process_video_async(exercise_video)
             
@@ -242,10 +397,10 @@ class VideoUploadView(View):
             })
             
         except Exception as e:
-            logger.error(f"Error uploading video: {e}")
+            logger.error(f"Error uploading video: {e}", exc_info=True)
             return JsonResponse({
                 'success': False,
-                'error': 'An error occurred while uploading the video.'
+                'error': f'An error occurred while uploading the video: {str(e)}'
             })
     
     def process_video_async(self, exercise_video):
