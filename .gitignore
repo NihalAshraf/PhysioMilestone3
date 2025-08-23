@@ -38,8 +38,7 @@ media/
 staticfiles/
 
 # Media files (user uploaded content)
-media/
-exercise_video/
+
 
 # Static files
 static/
@@ -149,3 +148,4 @@ node_modules/
 # Package files
 package-lock.json
 yarn.lock
+
