@@ -1,0 +1,97 @@
+{% extends 'Child/base.html' %}
+{% load static %}
+
+{% block title %}Available Doctors{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-user-md"></i> Available Doctors
+                        <span class="badge badge-primary ml-2">{{ total_doctors }}</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if doctors %}
+                        <div class="row">
+                            {% for doctor in doctors %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                                            <span class="text-white font-weight-bold" style="font-size: 2rem;">
+                                                {{ doctor.first_name|first }}{{ doctor.last_name|first }}
+                                            </span>
+                                        </div>
+                                        <h5 class="card-title">{{ doctor.first_name }} {{ doctor.last_name }}</h5>
+                                        <p class="text-muted mb-2">{{ doctor.email }}</p>
+                                        
+                                        <div class="row text-center mb-3">
+                                            <div class="col-6">
+                                                <small class="text-muted">Contact</small>
+                                                <p class="mb-0">{{ doctor.contact_number|default:"N/A" }}</p>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">Experience</small>
+                                                <p class="mb-0">Available</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-grid">
+                                            <a href="{% url 'consultation_request' doctor.pk %}" 
+                                               class="btn btn-primary">
+                                                <i class="fas fa-comments"></i> Request Consultation
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav aria-label="Doctor pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">&laquo; First</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No doctors available</h5>
+                            <p class="text-muted">Please check back later for available doctors.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

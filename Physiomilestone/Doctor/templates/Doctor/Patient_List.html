@@ -1,0 +1,120 @@
+{% extends 'Doctor/base.html' %}
+{% load static %}
+
+{% block title %}Patient List{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-users"></i> Patient List
+                        <span class="badge badge-primary ml-2">{{ total_patients }}</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if patients %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Age</th>
+                                        <th>Parent</th>
+                                        <th>Contact</th>
+                                        <th>Last Activity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for patient in patients %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3">
+                                                    <span class="text-white font-weight-bold">
+                                                        {{ patient.first_name|first }}{{ patient.last_name|first }}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0">{{ patient.first_name }} {{ patient.last_name }}</h6>
+                                                    <small class="text-muted">{{ patient.email }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ patient.age|default:"N/A" }}</td>
+                                        <td>{{ patient.parent_name|default:"N/A" }}</td>
+                                        <td>{{ patient.contact_number|default:"N/A" }}</td>
+                                        <td>
+                                            {% if patient.assigned_exercises.all %}
+                                                <small class="text-success">
+                                                    <i class="fas fa-clock"></i> 
+                                                    {{ patient.assigned_exercises.last.assigned_on|timesince }} ago
+                                                </small>
+                                            {% else %}
+                                                <small class="text-muted">No activity</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'patient_detail' patient.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="{% url 'patient_progress' patient.pk %}" 
+                                                   class="btn btn-sm btn-outline-info">
+                                                    <i class="fas fa-chart-line"></i> Progress
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav aria-label="Patient pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">&laquo; First</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No patients found</h5>
+                            <p class="text-muted">Patients will appear here once they register.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

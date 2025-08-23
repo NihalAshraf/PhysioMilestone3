@@ -1,0 +1,241 @@
+{% extends 'Doctor/base.html' %}
+{% load static %}
+
+{% block title %}{{ patient.first_name }}'s Progress{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title">
+                            <i class="fas fa-chart-line"></i> 
+                            {{ patient.first_name }} {{ patient.last_name }}'s Progress
+                        </h4>
+                        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left"></i> Back to Details
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Patient Info Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h5>Total Exercises</h5>
+                                    <h3>{{ chart_data.accuracies|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h5>Avg Accuracy</h5>
+                                    <h3>
+                                        {% if chart_data.accuracies %}
+                                            {{ chart_data.accuracies|length|floatformat:1 }}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h5>Total Reps</h5>
+                                    <h3>
+                                        {% if chart_data.reps_completed %}
+                                            {{ chart_data.reps_completed|sum }}
+                                        {% else %}
+                                            0
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h5>Active Days</h5>
+                                    <h3>{{ chart_data.dates|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Charts -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Progress Over Time (Last 30 Days)</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="progressChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Exercise Type Breakdown</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="exerciseChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exercise Type Details -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Exercise Performance by Type</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if exercise_types %}
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Exercise Type</th>
+                                                        <th>Total Sessions</th>
+                                                        <th>Average Accuracy</th>
+                                                        <th>Total Reps</th>
+                                                        <th>Performance</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for exercise_name, stats in exercise_types.items %}
+                                                    <tr>
+                                                        <td>
+                                                            <strong>{{ exercise_name }}</strong>
+                                                        </td>
+                                                        <td>{{ stats.count }}</td>
+                                                        <td>
+                                                            <div class="progress" style="height: 20px;">
+                                                                <div class="progress-bar bg-success" 
+                                                                     style="width: {{ stats.avg_accuracy }}%">
+                                                                    {{ stats.avg_accuracy }}%
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{ stats.total_reps }}</td>
+                                                        <td>
+                                                            {% if stats.avg_accuracy >= 80 %}
+                                                                <span class="badge badge-success">Excellent</span>
+                                                            {% elif stats.avg_accuracy >= 60 %}
+                                                                <span class="badge badge-warning">Good</span>
+                                                            {% else %}
+                                                                <span class="badge badge-danger">Needs Improvement</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                            <h6 class="text-muted">No exercise data available</h6>
+                                            <p class="text-muted">Progress data will appear here once exercises are completed.</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Progress Chart
+const progressCtx = document.getElementById('progressChart').getContext('2d');
+const progressChart = new Chart(progressCtx, {
+    type: 'line',
+    data: {
+        labels: {{ chart_data.dates|safe }},
+        datasets: [{
+            label: 'Accuracy (%)',
+            data: {{ chart_data.accuracies|safe }},
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }, {
+            label: 'Reps Completed',
+            data: {{ chart_data.reps_completed|safe }},
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            tension: 0.1,
+            yAxisID: 'y1'
+        }]
+    },
+    options: {
+        responsive: true,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                max: 100,
+                min: 0
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: {
+                    drawOnChartArea: false,
+                },
+            }
+        }
+    }
+});
+
+// Exercise Type Chart
+const exerciseCtx = document.getElementById('exerciseChart').getContext('2d');
+const exerciseChart = new Chart(exerciseCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for exercise_name, stats in exercise_types.items %}'{{ exercise_name }}',{% endfor %}],
+        datasets: [{
+            data: [{% for exercise_name, stats in exercise_types.items %}{{ stats.count }},{% endfor %}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

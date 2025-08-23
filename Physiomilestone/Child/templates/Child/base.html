@@ -4,15 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Parent Portal{% endblock %}</title>
+    <title>{% block title %}Child Portal{% endblock %}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Your app CSS -->
     <link rel="stylesheet" href="{% static 'Child/dashboard.css' %}">
+    <style>
+        .avatar-sm {
+            width: 40px;
+            height: 40px;
+        }
+        .avatar-lg {
+            width: 80px;
+            height: 80px;
+        }
+    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-100 text-slate-800">
@@ -20,22 +32,53 @@
     <!-- Navbar -->
     <nav class="bg-white shadow px-8 py-4 flex justify-between items-center">
         <div class="flex items-center gap-6">
-            <a href="{% url 'cdashboard' %}" class="text-2xl font-bold text-amber-500">Parent Portal</a>
-            <a href="{% url 'cdashboard' %}" class="font-semibold text-slate-700 hover:text-amber-500">Dashboard</a>
-            <a href="{% url 'profile' %}" class="font-semibold text-slate-700 hover:text-amber-500">Profile</a>
-            <a href="{% url 'instruction' %}" class="font-semibold text-slate-700 hover:text-amber-500">Exercises</a>
-            <!-- Add more navigation items here -->
+            <a href="{% url 'cdashboard' %}" class="text-2xl font-bold text-amber-500">Child Portal</a>
+            <a href="{% url 'cdashboard' %}" class="font-semibold text-slate-700 hover:text-amber-500">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{% url 'instruction' %}" class="font-semibold text-slate-700 hover:text-amber-500">
+                <i class="fas fa-dumbbell"></i> Exercises
+            </a>
+            <a href="{% url 'uploadexecise' %}" class="font-semibold text-slate-700 hover:text-amber-500">
+                <i class="fas fa-upload"></i> Upload
+            </a>
+            <a href="{% url 'progress' %}" class="font-semibold text-slate-700 hover:text-amber-500">
+                <i class="fas fa-chart-line"></i> Progress
+            </a>
+            <a href="{% url 'doctor_list' %}" class="font-semibold text-slate-700 hover:text-amber-500">
+                <i class="fas fa-user-md"></i> Doctors
+            </a>
+            <a href="{% url 'consultation_list' %}" class="font-semibold text-slate-700 hover:text-amber-500">
+                <i class="fas fa-comments"></i> Consultations
+                {% if pending_consultations %}
+                    <span class="bg-red-500 text-white rounded-full px-2 py-1 text-xs">{{ pending_consultations }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'profile' %}" class="font-semibold text-slate-700 hover:text-amber-500">
+                <i class="fas fa-user"></i> Profile
+            </a>
         </div>
         <div>
             <a href="{% url 'logout' %}" 
-   class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
-   Logout
-</a>
+               class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+               <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 min-h-[60vh]">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
         {% block content %}
         <!-- Child pages insert content here -->
         {% endblock %}
@@ -43,7 +86,7 @@
 
     <!-- Footer -->
     <footer class="bg-white text-center py-4 text-sm text-slate-400 shadow mt-auto">
-        &copy; {{ year }} Parent Portal. All rights reserved.
+        &copy; 2025 Child Portal. All rights reserved.
     </footer>
 
     {% block extra_scripts %}{% endblock %}

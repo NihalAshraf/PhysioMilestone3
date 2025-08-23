@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView, DetailView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from Doctor.models import AssignExercise
+from django.contrib import messages
+from django.utils import timezone
+from Doctor.models import AssignExercise, Consultation
 from .models import ExerciseVideo, ExerciseSession
 from .utils.exercise_validator import ExerciseValidator
 import os
@@ -40,6 +42,19 @@ class DashboardView(TemplateView):
             Patient_name=user
         ).last()
         context["current_exercise"] = current_exercise
+        
+        # Get pending consultations
+        pending_consultations = Consultation.objects.filter(
+            child=user,
+            status='pending'
+        ).count()
+        context["pending_consultations"] = pending_consultations
+        
+        # Get recent consultations
+        recent_consultations = Consultation.objects.filter(
+            child=user
+        ).order_by('-requested_at')[:3]
+        context["recent_consultations"] = recent_consultations
         
         return context
 
@@ -97,6 +112,82 @@ class uploadexeciseView(TemplateView):
         assigned_exercise = AssignExercise.objects.filter(Patient_name=user).last()
         context["assigned_exercise"] = assigned_exercise
         return context
+
+# New Consultation Views
+@method_decorator(login_required, name='dispatch')
+class DoctorListView(ListView):
+    template_name = "Child/Doctor_List.html"
+    context_object_name = "doctors"
+    paginate_by = 10
+    
+    def get_queryset(self):
+        return CustomUSer.objects.filter(role="doctor").order_by('first_name')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_doctors"] = self.get_queryset().count()
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class ConsultationRequestView(View):
+    template_name = "Child/Consultation_Request.html"
+    
+    def get(self, request, doctor_id):
+        doctor = get_object_or_404(CustomUSer, id=doctor_id, role="doctor")
+        return render(request, self.template_name, {"doctor": doctor})
+    
+    def post(self, request, doctor_id):
+        doctor = get_object_or_404(CustomUSer, id=doctor_id, role="doctor")
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        if subject and message:
+            Consultation.objects.create(
+                child=request.user,
+                doctor=doctor,
+                subject=subject,
+                message=message
+            )
+            messages.success(request, "Consultation request sent successfully!")
+            return redirect('consultation_list')
+        else:
+            messages.error(request, "Please fill in all fields.")
+            return render(request, self.template_name, {"doctor": doctor})
+
+@method_decorator(login_required, name='dispatch')
+class ConsultationListView(ListView):
+    template_name = "Child/Consultation_List.html"
+    context_object_name = "consultations"
+    paginate_by = 10
+    
+    def get_queryset(self):
+        return Consultation.objects.filter(child=self.request.user).order_by('-requested_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Get counts by status
+        context["pending_count"] = Consultation.objects.filter(
+            child=user, status='pending'
+        ).count()
+        context["accepted_count"] = Consultation.objects.filter(
+            child=user, status='accepted'
+        ).count()
+        context["completed_count"] = Consultation.objects.filter(
+            child=user, status='completed'
+        ).count()
+        
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class ConsultationDetailView(DetailView):
+    template_name = "Child/Consultation_Detail.html"
+    model = Consultation
+    context_object_name = "consultation"
+    
+    def get_queryset(self):
+        return Consultation.objects.filter(child=self.request.user)
 
 @method_decorator(login_required, name='dispatch')
 class VideoUploadView(View):
