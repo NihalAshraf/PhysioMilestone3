@@ -8,6 +8,7 @@ from django.views import View
 from django.contrib import messages
 from django.utils import timezone
 from Doctor.models import AssignExercise, Consultation
+from USER.models import CustomUSer
 from .models import ExerciseVideo, ExerciseSession
 from .utils.exercise_validator import ExerciseValidator
 import os
