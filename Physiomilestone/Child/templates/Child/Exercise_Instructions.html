@@ -45,10 +45,10 @@
                 </ul>
             </div>
             <div class="text-center">
-                <a href="{% url 'instruction' %}" 
+                <button id="beginExerciseBtn" 
                    class="w-full inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 text-lg">
                     Let's Begin!
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -62,4 +62,250 @@
         &larr; Go back to Dashboard
     </a>
 </footer>
+
+<!-- Video Upload Modal -->
+<div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <div class="text-center">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Upload Your Exercise Video</h3>
+            <p class="text-gray-600 mb-6">
+                Record yourself performing the exercise and upload the video for analysis.
+            </p>
+            
+            <!-- Upload Form -->
+            <form id="videoUploadForm" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input type="file" id="videoFile" name="video" accept="video/*" class="hidden" required>
+                    <label for="videoFile" class="cursor-pointer">
+                        <div class="text-gray-400 mb-2">
+                            <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <p class="text-sm text-gray-600">Click to select video file</p>
+                        <p class="text-xs text-gray-500 mt-1">MP4, AVI, MOV, WMV (max 100MB)</p>
+                    </label>
+                </div>
+                
+                <div id="fileInfo" class="hidden text-sm text-gray-600">
+                    <p>Selected file: <span id="fileName"></span></p>
+                    <p>Size: <span id="fileSize"></span></p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button type="button" id="cancelUpload" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" id="uploadBtn" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                        Upload & Analyze
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Processing Status -->
+            <div id="processingStatus" class="hidden mt-4">
+                <div class="flex items-center justify-center space-x-2">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
+                    <p class="text-gray-600">Processing your video...</p>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">This may take a few minutes</p>
+            </div>
+            
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                <p id="errorText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Modal -->
+<div id="resultsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 max-w-lg w-full mx-4">
+        <div class="text-center">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Exercise Analysis Results</h3>
+            
+            <div id="resultsContent" class="space-y-4">
+                <!-- Results will be populated here -->
+            </div>
+            
+            <div class="flex space-x-3 mt-6">
+                <button id="closeResults" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors">
+                    Close
+                </button>
+                <a id="viewDetailedResults" href="#" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                    View Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('uploadModal');
+    const resultsModal = document.getElementById('resultsModal');
+    const beginBtn = document.getElementById('beginExerciseBtn');
+    const cancelBtn = document.getElementById('cancelUpload');
+    const closeResultsBtn = document.getElementById('closeResults');
+    const uploadForm = document.getElementById('videoUploadForm');
+    const videoFile = document.getElementById('videoFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const processingStatus = document.getElementById('processingStatus');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const resultsContent = document.getElementById('resultsContent');
+    const viewDetailedResults = document.getElementById('viewDetailedResults');
+    
+    let currentVideoId = null;
+    
+    // Show upload modal
+    beginBtn.addEventListener('click', function() {
+        modal.classList.remove('hidden');
+    });
+    
+    // Hide upload modal
+    cancelBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        resetForm();
+    });
+    
+    // Close results modal
+    closeResultsBtn.addEventListener('click', function() {
+        resultsModal.classList.add('hidden');
+    });
+    
+    // File selection
+    videoFile.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+        } else {
+            fileInfo.classList.add('hidden');
+        }
+    });
+    
+    // Form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        // Show processing status
+        processingStatus.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
+        
+        // Disable upload button
+        document.getElementById('uploadBtn').disabled = true;
+        
+        fetch('{% url "upload_video" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                currentVideoId = data.video_id;
+                checkVideoStatus(data.video_id);
+            } else {
+                showError(data.error);
+            }
+        })
+        .catch(error => {
+            showError('An error occurred while uploading the video.');
+        });
+    });
+    
+    function checkVideoStatus(videoId) {
+        fetch(`{% url "video_status" video_id=0 %}`.replace('0', videoId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.status === 'completed') {
+                    showResults(data.results, videoId);
+                } else if (data.status === 'failed') {
+                    showError(data.error || 'Video processing failed.');
+                } else {
+                    // Still processing, check again in 2 seconds
+                    setTimeout(() => checkVideoStatus(videoId), 2000);
+                }
+            } else {
+                showError('Error checking video status.');
+            }
+        })
+        .catch(error => {
+            showError('Error checking video status.');
+        });
+    }
+    
+    function showResults(results, videoId) {
+        processingStatus.classList.add('hidden');
+        modal.classList.add('hidden');
+        
+        const accuracyColor = results.overall_score >= 80 ? 'text-green-600' : 
+                             results.overall_score >= 60 ? 'text-yellow-600' : 'text-red-600';
+        
+        resultsContent.innerHTML = `
+            <div class="grid grid-cols-2 gap-4 text-left">
+                <div class="bg-gray-50 p-4 rounded">
+                    <h4 class="font-semibold text-gray-700">Exercise Type</h4>
+                    <p class="text-gray-900">${results.exercise_type || 'Unknown'}</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <h4 class="font-semibold text-gray-700">Overall Score</h4>
+                    <p class="${accuracyColor} font-bold">${results.overall_score}%</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <h4 class="font-semibold text-gray-700">Reps Completed</h4>
+                    <p class="text-gray-900">${results.total_reps} / ${results.target_reps}</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                    <h4 class="font-semibold text-gray-700">Sets Completed</h4>
+                    <p class="text-gray-900">${results.total_sets} / ${results.target_sets}</p>
+                </div>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+                <p>Reps Accuracy: ${results.reps_accuracy}%</p>
+                <p>Sets Accuracy: ${results.sets_accuracy}%</p>
+                <p>Pose Accuracy: ${results.accuracy_score}%</p>
+            </div>
+        `;
+        
+        viewDetailedResults.href = `{% url "exercise_results" video_id=0 %}`.replace('0', videoId);
+        resultsModal.classList.remove('hidden');
+        
+        resetForm();
+    }
+    
+    function showError(message) {
+        processingStatus.classList.add('hidden');
+        errorText.textContent = message;
+        errorMessage.classList.remove('hidden');
+        document.getElementById('uploadBtn').disabled = false;
+    }
+    
+    function resetForm() {
+        uploadForm.reset();
+        fileInfo.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+        document.getElementById('uploadBtn').disabled = false;
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+});
+</script>
 {% endblock %}

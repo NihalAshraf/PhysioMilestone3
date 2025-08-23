@@ -1,13 +1,13 @@
 {% extends 'Child/base.html' %}
 {% load static %}
 
-{% block title %}Parent Dashboard{% endblock %}
+{% block title %}Child Dashboard{% endblock %}
 
 {% block content %}
 <header class="mb-8">
-    <h1 class="text-3xl font-bold text-slate-900">Parent Dashboard</h1>
+    <h1 class="text-3xl font-bold text-slate-900">Child Dashboard</h1>
     <p class="text-slate-500 mt-1">
-        Welcome, {{ name }}! Here you can view your child's profile, assigned exercises, and track their progress.
+        Welcome, {{ name }}! Here you can view your assigned exercises, track your progress, and upload exercise videos.
     </p>
 </header>
 
@@ -15,7 +15,7 @@
     <!-- Left Column: Child Profile -->
     <aside class="lg:col-span-1 space-y-8">
         <section class="bg-white p-6 rounded-2xl shadow-md">
-            <h2 class="text-xl font-bold mb-4"></h2>
+            <h2 class="text-xl font-bold mb-4">Your Profile</h2>
             <div class="flex items-center space-x-4">
                 <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center">
                     <span class="text-white text-3xl font-bold">{{ name|slice:":1" }}</span>
@@ -23,63 +23,170 @@
                 <div>
                     <h3 class="text-lg font-semibold">{{ name }}</h3>
                     <p class="text-slate-500">Age: {{ age }} years</p>
+                    <p class="text-slate-500">Parent: {{ parent }}</p>
                 </div>
             </div>
         </section>
+
+        <!-- Current Exercise -->
+        {% if current_exercise %}
+        <section class="bg-white p-6 rounded-2xl shadow-md">
+            <h2 class="text-xl font-bold mb-4">Current Exercise</h2>
+            <div class="space-y-3">
+                <div>
+                    <h3 class="font-semibold text-lg">{{ current_exercise.Exercise.name }}</h3>
+                    <p class="text-sm text-slate-600">{{ current_exercise.Exercise.description }}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                        <span class="text-slate-500">Target Reps:</span>
+                        <span class="font-semibold">{{ current_exercise.reps }}</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500">Target Sets:</span>
+                        <span class="font-semibold">{{ current_exercise.sets }}</span>
+                    </div>
+                </div>
+                <a href="{% url 'instruction' %}" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg text-center transition-colors block">
+                    Start Exercise
+                </a>
+            </div>
+        </section>
+        {% endif %}
     </aside>
 
     <!-- Right Column: Main Content -->
     <div class="lg:col-span-2 space-y-8">
-        <!-- Weekly Progress Overview -->
+        <!-- Recent Exercise Videos -->
         <section class="bg-white p-6 rounded-2xl shadow-md">
-            <h2 class="text-xl font-bold mb-2">Weekly Progress Overview</h2>
-            <p class="text-slate-500 mb-6">This chart shows your child's overall progress score over the last few weeks.</p>
-            <div>
-                <canvas id="weeklyProgressChart"></canvas>
-            </div>
-        </section>
-
-        <!-- Assigned Exercises -->
-        <section class="bg-white p-6 rounded-2xl shadow-md">
-            <h2 class="text-xl font-bold mb-2">Assigned Exercises</h2>
-            <p class="text-slate-500 mb-6">Here are the exercises assigned for your child. Click "Start Exercise" to begin a gamified session.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for exercise in assigned_exercises %}
-                <div class="border border-slate-200 rounded-lg p-4 flex flex-col">
-                    <div class="flex-grow">
-                        <h3 class="font-semibold">{{ exercise.name }}</h3>
-                        <p class="text-sm text-slate-500 mt-1">{{ exercise.description }}</p>
-                        <p class="text-sm mt-2"><span class="font-semibold">Status:</span>
-                            <span class="text-blue-600">{{ exercise.status }}</span>
-                        </p>
+            <h2 class="text-xl font-bold mb-4">Recent Exercise Videos</h2>
+            {% if recent_videos %}
+            <div class="space-y-4">
+                {% for video in recent_videos %}
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-semibold">{{ video.assignment.Exercise.name }}</h3>
+                            <p class="text-sm text-gray-600">{{ video.uploaded_at|date:"M d, Y H:i" }}</p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <span class="text-sm">
+                                    <span class="text-gray-500">Score:</span>
+                                    <span class="font-semibold {% if video.overall_score >= 80 %}text-green-600{% elif video.overall_score >= 60 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                                        {{ video.overall_score|floatformat:1 }}%
+                                    </span>
+                                </span>
+                                <span class="text-sm">
+                                    <span class="text-gray-500">Reps:</span>
+                                    <span class="font-semibold">{{ video.total_reps }}/{{ video.target_reps }}</span>
+                                </span>
+                                <span class="text-sm">
+                                    <span class="text-gray-500">Status:</span>
+                                    <span class="font-semibold capitalize">{{ video.processing_status }}</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            {% if video.processing_status == 'completed' %}
+                            <a href="{% url 'exercise_results' video.id %}" class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded transition-colors">
+                                View Results
+                            </a>
+                            {% elif video.processing_status == 'processing' %}
+                            <span class="bg-yellow-500 text-white text-sm px-3 py-1 rounded">
+                                Processing...
+                            </span>
+                            {% elif video.processing_status == 'failed' %}
+                            <span class="bg-red-500 text-white text-sm px-3 py-1 rounded">
+                                Failed
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
-                    <a href="{% url 'start_exercise' exercise.id %}" class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg text-center transition-colors">Start Exercise</a>
                 </div>
-                {% empty %}
-                <div>No exercises assigned.</div>
                 {% endfor %}
+                <div class="text-center">
+                    <a href="{% url 'progress' %}" class="text-amber-600 hover:text-amber-700 font-semibold">
+                        View All Videos →
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="text-gray-400 mb-4">
+                    <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <p class="text-gray-600 mb-4">No exercise videos uploaded yet.</p>
+                {% if current_exercise %}
+                <a href="{% url 'instruction' %}" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Start Your First Exercise
+                </a>
+                {% else %}
+                <p class="text-gray-500">No exercises assigned yet. Please contact your doctor.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="bg-white p-6 rounded-2xl shadow-md">
+            <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a href="{% url 'instruction' %}" class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-lg text-center transition-colors">
+                    <div class="text-2xl mb-2">🏃‍♂️</div>
+                    <h3 class="font-semibold">Start Exercise</h3>
+                    <p class="text-sm opacity-90">Begin your assigned exercise</p>
+                </a>
+                <a href="{% url 'progress' %}" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-center transition-colors">
+                    <div class="text-2xl mb-2">📊</div>
+                    <h3 class="font-semibold">View Progress</h3>
+                    <p class="text-sm opacity-90">Track your improvement</p>
+                </a>
+                <a href="{% url 'profile' %}" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg text-center transition-colors">
+                    <div class="text-2xl mb-2">👤</div>
+                    <h3 class="font-semibold">Edit Profile</h3>
+                    <p class="text-sm opacity-90">Update your information</p>
+                </a>
+                <a href="{% url 'uploadexecise' %}" class="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-lg text-center transition-colors">
+                    <div class="text-2xl mb-2">📹</div>
+                    <h3 class="font-semibold">Upload Video</h3>
+                    <p class="text-sm opacity-90">Submit exercise recording</p>
+                </a>
             </div>
         </section>
 
-        <!-- Session Calendar -->
+        <!-- Progress Summary -->
         <section class="bg-white p-6 rounded-2xl shadow-md">
-            <h2 class="text-xl font-bold mb-2">Session Calendar</h2>
-            <p class="text-slate-500 mb-6">Track completed and missed sessions for a clear overview of your child's engagement.</p>
-
-            <div class="grid grid-cols-7 gap-2 text-center font-semibold text-slate-500 text-sm">
-                {% for day in days_of_week %}
-                <div>{{ day }}</div>
-                {% endfor %}
-            </div>
-            <div class="grid grid-cols-7 gap-2 mt-2 text-sm">
-                {% for cell in calendar_cells %}
-                <div>
-                    <span class="calendar-day 
-                        {% if cell.completed %}day-completed{% elif cell.missed %}day-missed{% elif cell.is_today %}day-today{% endif %}">
-                        {{ cell.day }}
-                    </span>
+            <h2 class="text-xl font-bold mb-4">Progress Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-2xl font-bold text-amber-600">{{ recent_videos.count }}</div>
+                    <p class="text-sm text-gray-600">Videos Uploaded</p>
                 </div>
-                {% endfor %}
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600">
+                        {% if recent_videos %}
+                            {% for video in recent_videos %}
+                                {% if video.processing_status == 'completed' %}
+                                    {{ forloop.counter }}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </div>
+                    <p class="text-sm text-gray-600">Completed Sessions</p>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600">
+                        {% if current_exercise %}
+                            {{ current_exercise.Exercise.name|slice:":10" }}...
+                        {% else %}
+                            None
+                        {% endif %}
+                    </div>
+                    <p class="text-sm text-gray-600">Current Exercise</p>
+                </div>
             </div>
         </section>
     </div>

@@ -1,0 +1,173 @@
+{% extends "Child/base.html" %}
+{% load static %}
+
+{% block title %}Exercise Results - PhysioMilestones{% endblock %}
+
+{% block content %}
+<main class="w-full max-w-6xl bg-white p-8 rounded-2xl shadow-md mx-auto">
+    <!-- Header -->
+    <header class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">Exercise Analysis Results</h1>
+        <p class="text-slate-500 mt-1">
+            Detailed analysis of your {{ video.assignment.Exercise.name }} performance
+        </p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Video and Basic Info -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Video Player -->
+            <div class="bg-gray-100 rounded-lg p-4">
+                <h3 class="text-lg font-semibold mb-3">Your Exercise Video</h3>
+                <video controls class="w-full rounded-lg">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <!-- Exercise Details -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4">Exercise Details</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Exercise:</span>
+                        <span class="font-medium">{{ video.assignment.Exercise.name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Uploaded:</span>
+                        <span class="font-medium">{{ video.uploaded_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Status:</span>
+                        <span class="font-medium capitalize">{{ video.processing_status }}</span>
+                    </div>
+                    {% if video.frames_processed %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Frames Analyzed:</span>
+                        <span class="font-medium">{{ video.frames_processed }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Results -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Overall Score -->
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-6">
+                <h3 class="text-xl font-bold mb-4">Overall Performance Score</h3>
+                <div class="text-center">
+                    <div class="text-6xl font-bold {% if video.overall_score >= 80 %}text-green-600{% elif video.overall_score >= 60 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        {{ video.overall_score|floatformat:1 }}%
+                    </div>
+                    <p class="text-gray-600 mt-2">
+                        {% if video.overall_score >= 80 %}
+                            Excellent! Keep up the great work!
+                        {% elif video.overall_score >= 60 %}
+                            Good effort! Practice more to improve.
+                        {% else %}
+                            Keep practicing! You'll get better with time.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Repetitions -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h4 class="text-lg font-semibold mb-4">Repetitions</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Completed:</span>
+                            <span class="font-bold text-lg">{{ video.total_reps }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Target:</span>
+                            <span class="font-medium">{{ video.target_reps }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-amber-500 h-2 rounded-full" style="width: {{ video.reps_accuracy }}%"></div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-sm text-gray-600">Accuracy: {{ video.reps_accuracy|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sets -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h4 class="text-lg font-semibold mb-4">Sets</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Completed:</span>
+                            <span class="font-bold text-lg">{{ video.total_sets }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Target:</span>
+                            <span class="font-medium">{{ video.target_sets }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-amber-500 h-2 rounded-full" style="width: {{ video.sets_accuracy }}%"></div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-sm text-gray-600">Accuracy: {{ video.sets_accuracy|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pose Accuracy -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h4 class="text-lg font-semibold mb-4">Pose Accuracy</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Overall Pose Score:</span>
+                        <span class="font-bold text-lg {% if video.accuracy_score >= 80 %}text-green-600{% elif video.accuracy_score >= 60 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                            {{ video.accuracy_score|floatformat:1 }}%
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="{% if video.accuracy_score >= 80 %}bg-green-500{% elif video.accuracy_score >= 60 %}bg-yellow-500{% else %}bg-red-500{% endif %} h-2 rounded-full" style="width: {{ video.accuracy_score }}%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        This score reflects how well your body positioning matched the expected exercise form.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feedback -->
+            {% if video.feedback %}
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h4 class="text-lg font-semibold mb-4 text-blue-900">Feedback</h4>
+                <p class="text-blue-800">{{ video.feedback }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Error Message (if processing failed) -->
+            {% if video.processing_status == 'failed' and video.processing_error %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                <h4 class="text-lg font-semibold mb-4 text-red-900">Processing Error</h4>
+                <p class="text-red-800">{{ video.processing_error }}</p>
+                <p class="text-sm text-red-600 mt-2">
+                    Please try uploading the video again or contact support if the problem persists.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="{% url 'instruction' %}" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center">
+            Try Another Exercise
+        </a>
+        <a href="{% url 'progress' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center">
+            View Progress Report
+        </a>
+        <a href="{% url 'cdashboard' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors text-center">
+            Back to Dashboard
+        </a>
+    </div>
+</main>
+{% endblock %}
