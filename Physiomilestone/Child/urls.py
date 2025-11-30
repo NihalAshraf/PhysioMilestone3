@@ -7,6 +7,7 @@ urlpatterns = [
     path("profile/",views.ProfileView.as_view(),name="profile"),
     path("progress/",views.progressView.as_view(),name="progress"),
     path("uploadexecise/",views.uploadexeciseView.as_view(),name="uploadexecise"),
+    path('leaderboard/', views.consistency_leaderboard, name='leaderboard'),
     
     # Consultation features
     path("doctors/",views.DoctorListView.as_view(),name="child_doctor_list"),
@@ -19,5 +20,6 @@ urlpatterns = [
     path("test-upload/", views.TestUploadView.as_view(), name="test_upload"),
     path("video-status/<int:video_id>/", views.VideoStatusView.as_view(), name="video_status"),
     path("exercise-results/<int:video_id>/", views.ExerciseResultsView.as_view(), name="exercise_results"),
+
 ]
 

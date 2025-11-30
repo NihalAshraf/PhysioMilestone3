@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib import messages
 from django.utils import timezone
+from datetime import timedelta
 from Doctor.models import AssignExercise, Consultation
 from USER.models import CustomUSer
 from .models import ExerciseVideo, ExerciseSession
@@ -15,6 +16,7 @@ import os
 import json
 import logging
 from django.conf import settings
+from django.db.models import Count
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
@@ -514,3 +516,19 @@ class ExerciseResultsView(TemplateView):
 
 
 
+
+
+
+def consistency_leaderboard(request):
+    today = timezone.now()
+    week_start = today - timedelta(days=7)
+
+    leaders = ExerciseSession.objects.filter(
+        session_date__gte=week_start
+    ).values(
+        'patient__first_name', 'patient__last_name'
+    ).annotate(
+        sessions_count=Count('id')
+    ).order_by('-sessions_count')
+
+    return render(request, 'Child/consistency_leaderboard.html', {'leaders': leaders})
